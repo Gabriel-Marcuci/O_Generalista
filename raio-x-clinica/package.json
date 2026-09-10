@@ -1,12 +1,16 @@
 {
   "name": "raio-x-clinica",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Motor de diagnóstico comercial de clínicas de estética: respostas do quiz → scores, flags, selos, oferta e payload do laudo.",
   "scripts": {
-    "test": "node --test lib/*.test.js",
-    "exemplo": "node lib/cli.js lib/exemplo.secretaria-r500.json"
+    "test": "node --test lib/*.test.js api/*.test.js",
+    "exemplo": "node lib/cli.js lib/exemplo.secretaria-r500.json",
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
   },
   "engines": {
     "node": ">=20"
