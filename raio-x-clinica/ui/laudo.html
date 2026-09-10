@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raio-X da Clínica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./laudo.css" />
+</head>
+<body>
+  <div class="stage">
+    <aside class="device" aria-label="Prévia do laudo">
+      <article class="report" id="report">
+        <header class="report-top">
+          <div class="kicker">
+            <span>Raio-X da clínica</span>
+            <span id="report-date">Setembro · 2026</span>
+          </div>
+          <h1>Avaliação de maturidade comercial</h1>
+          <p class="meta" id="report-meta">Camila · Dona e profissional · HOF</p>
+        </header>
+
+        <section class="hero-grid">
+          <div class="radar-wrap">
+            <svg id="radar" viewBox="0 0 320 320" role="img" aria-label="Radar de maturidade"></svg>
+          </div>
+          <div class="hero-side">
+            <div class="persona" id="persona">
+              <p class="persona-label">Persona</p>
+              <h2 id="persona-title">—</h2>
+              <p id="persona-sub">—</p>
+            </div>
+            <div class="bars" id="bars"></div>
+          </div>
+        </section>
+
+        <section class="badges-block">
+          <p class="block-label">Condecorações</p>
+          <div class="badges" id="badges"></div>
+        </section>
+
+        <section class="swot" id="swot"></section>
+      </article>
+    </aside>
+
+    <section class="copy">
+      <p class="eyebrow">Self-assessment</p>
+      <h2>Descubra o nível de maturidade da sua clínica</h2>
+      <p>Avaliação nas 4 frentes que sustentam faturamento: marca, captação, conversão e equipe.</p>
+      <p class="fine">8 minutos · 100% gratuito</p>
+      <a class="cta" href="#report">Ver laudo de exemplo →</a>
+      <p class="privacy">Prévia da fixture Camila (HOF). O quiz real preenche este card ao vivo.</p>
+    </section>
+  </div>
+  <script type="module" src="./laudo.js"></script>
+</body>
+</html>
