@@ -1,0 +1,197 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.card h1 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 32px;
+}
+
+.card h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.progress {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.opcao:hover {
+  border-color: #667eea;
+  background: #f9f9f9;
+}
+
+.opcao input {
+  margin-right: 12px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.likert {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 25px 0;
+}
+
+@media (max-width: 500px) {
+  .likert {
+    grid-template-columns: 1fr;
+  }
+}
+
+.likertLabel {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+.likertLabel:hover {
+  border-color: #667eea;
+  background: #f9f9f9;
+}
+
+.likertLabel input {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.botoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn, .btnSecundario {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSecundario {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btnSecundario:hover {
+  background: #e0e0e0;
+}
+
+.erro {
+  color: #e74c3c;
+  margin: 15px 0 0 0;
+  font-size: 14px;
+  padding: 12px;
+  background: #fdeaea;
+  border-radius: 6px;
+}
+
+.radar {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 6px;
+  margin: 25px 0;
+}
+
+.radar p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.oferta {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 20px;
+  border-radius: 6px;
+  margin: 25px 0;
+}
+
+.oferta h2 {
+  margin-top: 0;
+  color: #667eea;
+}
