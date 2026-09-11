@@ -25,7 +25,7 @@ function desmodularizar(src) {
     .replace(/^export\s+(const|let|var|function|async function|class)\s/gm, '$1 ')
 }
 
-const modulos = ['lib/questions.js', 'lib/score.js', 'app/scripts/flow.js', 'app/scripts/app.js']
+const modulos = ['lib/questions.js', 'lib/score.js', 'app/scripts/flow.js', 'app/scripts/app.js', 'app/scripts/stories.js']
   .map((p) => `// ---- ${p}\n${desmodularizar(read(p))}`)
   .join('\n\n')
 
