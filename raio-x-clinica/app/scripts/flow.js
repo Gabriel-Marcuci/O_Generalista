@@ -55,7 +55,14 @@ export function faixa(score) {
   return 'low'
 }
 
-export const COR_FAIXA = { top: '#89CC72', good: '#5E9F4E', mid: '#D4A637', low: '#C44545', none: '#1A5440' }
+// As cores das faixas vivem no CSS (cada tema define as suas). O JS só lê.
+const COR_PADRAO = { top: '#FFFFFF', good: '#A1A1A6', mid: '#FF9F0A', low: '#FF453A', none: 'rgba(255,255,255,.18)' }
+const VAR_FAIXA = { top: '--tier-top', good: '--tier-good', mid: '--tier-mid', low: '--tier-low', none: '--hairline-strong' }
+
+export function corFaixa(f, root = document.documentElement) {
+  const v = getComputedStyle(root).getPropertyValue(VAR_FAIXA[f] || '--tier-good').trim()
+  return v || COR_PADRAO[f] || COR_PADRAO.good
+}
 
 // ---------------------------------------------------------------------------
 // Perguntas na ordem do chat (versão 8 minutos + bônus)
@@ -164,25 +171,49 @@ export const ANALISE_FRASES = [
 const L = (a, id) => a.likert[id]
 const S = (a, id) => a.categoricas[id]
 
+
+// Ícones de linha (24x24, stroke currentColor). Sem emoji: o card é sóbrio.
+const I = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}${extra}</svg>`
+const ICONE = {
+  margem: I('<path d="M6 18 18 6"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>'),
+  cheio: I('<path d="M12 3 4 9l8 12 8-12z"/><path d="M4 9h16"/>'),
+  protocolo: I('<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/>'),
+  avaliacao: I('<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3H9z"/><path d="M9 13l2 2 4-4"/>'),
+  conversa: I('<path d="M20 14a3 3 0 0 1-3 3H9l-4 3V7a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3z"/>'),
+  roteiro: I('<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6H14a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h5.5" transform="translate(0,-2)"/>'),
+  medir: I('<path d="M4 18V9M10 18V5M16 18v-6M22 18h-20"/>'),
+  agendaFollow: I('<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M12 13v3l2 1"/>'),
+  espelho: I('<rect x="3" y="5" width="7" height="14" rx="1.5"/><rect x="14" y="5" width="7" height="14" rx="1.5"/><path d="M12 3v18"/>'),
+  base: I('<path d="M3 20h18M6 20V10l6-5 6 5v10"/><path d="M10 20v-5h4v5"/>'),
+  origem: I('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11z"/>'),
+  alvo: I('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>'),
+  relogio: I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'),
+  automatico: I('<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4h-4"/>'),
+  closer: I('<path d="M4 12.5 8 9l3.5 2.5L16 7l4 3"/><path d="M4 19h16"/><circle cx="8" cy="9" r="1.6"/>'),
+  comissao: I('<circle cx="12" cy="12" r="9"/><path d="M14.5 9.2A3 3 0 0 0 9.6 11c0 2.6 5 1.4 5 4a3 3 0 0 1-5 1.9M12 7v10"/>'),
+  noite: I('<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>'),
+  metodo: I('<path d="M12 4 3 8.5 12 13l9-4.5z"/><path d="M6.5 10.8V15c0 1.7 2.5 3 5.5 3s5.5-1.3 5.5-3v-4.2"/>'),
+}
+
 export const BADGES = [
-  { id: 'preco_por_margem', icon: '🧮', nome: 'Preço por margem', blurb: 'Tabela feita com custo e posicionamento, não olhando a concorrente.', when: (a) => L(a, 'P2') === 4 },
-  { id: 'valor_cheio', icon: '💎', nome: 'Valor cheio', blurb: 'Desconto é exceção com regra, não idioma.', when: (a) => L(a, 'P3') >= 3 },
-  { id: 'protocolo_nao_sessao', icon: '📋', nome: 'Protocolo, não sessão', blurb: 'O produto principal é plano, não sessão avulsa.', when: (a) => L(a, 'P4') === 4 },
-  { id: 'avaliacao_com_processo', icon: '🩺', nome: 'Avaliação com processo', blurb: 'Preço só entra depois do plano.', when: (a) => L(a, 'P6') === 4 },
-  { id: 'conteudo_que_abre_conversa', icon: '🗣️', nome: 'Conteúdo que abre conversa', blurb: 'O Instagram fala de problema e resultado, não só de tabela.', when: (a) => L(a, 'P7') >= 3 },
-  { id: 'roteiro_do_oi_ao_pix', icon: '🧭', nome: 'Roteiro do oi ao pix', blurb: 'O atendimento não depende do humor de quem pegou o celular.', when: (a) => L(a, 'C1') >= 3 },
-  { id: 'mede_a_taxa', icon: '📈', nome: 'Mede a taxa', blurb: 'Sabe quantas conversas viram avaliação e quantas viram protocolo.', when: (a) => L(a, 'C2') === 4 },
-  { id: 'followup_com_data', icon: '📅', nome: 'Follow-up com data', blurb: '"Vou pensar" entra numa sequência, não no limbo.', when: (a) => L(a, 'C3') >= 3 },
-  { id: 'uma_clinica_so', icon: '🪞', nome: 'Uma clínica só', blurb: 'Anúncio, recepção e avaliação prometem a mesma coisa.', when: (a) => L(a, 'C7') >= 3 },
-  { id: 'agenda_sem_depender_do_post', icon: '🧱', nome: 'Agenda sem depender do post', blurb: 'Sete dias sem postar e a agenda não sente.', when: (a) => L(a, 'CAP1') !== null && L(a, 'CAP1') <= 2 },
-  { id: 'sabe_a_origem', icon: '🧭', nome: 'Sabe a origem', blurb: 'Cada paciente da semana tem canal registrado.', when: (a) => L(a, 'CAP2') === 4 },
-  { id: 'anuncio_com_proximo_passo', icon: '🎯', nome: 'Anúncio com próximo passo', blurb: 'Post e anúncio pedem avaliação, não só mostram resultado bonito.', when: (a) => L(a, 'CAP3') >= 3 },
-  { id: 'cobertura_real', icon: '🕘', nome: 'Cobertura real', blurb: 'O WhatsApp tem horário de cobertura, não "quando der".', when: (a) => L(a, 'WA1') >= 3 },
-  { id: 'followup_automatico', icon: '⚙️', nome: 'Follow-up automático', blurb: 'Ninguém precisa lembrar de cobrar o "vou pensar".', when: (a) => L(a, 'WA3') >= 3 },
-  { id: 'closer_de_verdade', icon: '🤝', nome: 'Closer de verdade', blurb: 'Alguém conduz protocolo de ticket alto sem te chamar.', when: (a) => S(a, 'S2') === 'sim' },
-  { id: 'comissao_por_protocolo', icon: '💰', nome: 'Comissão por protocolo', blurb: 'Quem vende ganha quando fecha, não quando despacha.', when: (a) => S(a, 'S3') === 'fixo_protocolo' },
-  { id: 'lead_21h_vivo', icon: '🌙', nome: 'Lead das 21h vivo', blurb: 'Fora de hora tem fluxo que segura a conversa e marca.', when: (a) => S(a, 'S5') === 'fluxo_marca' },
-  { id: 'lead_e_venda', icon: '🎓', nome: 'Lead é venda', blurb: 'A clínica trata lead como alguém a ser vendido com ética e processo.', when: (a) => S(a, 'S6') === 'vendida_com_processo' },
+  { id: 'preco_por_margem', icon: ICONE.margem, nome: 'Preço por margem', blurb: 'Tabela feita com custo e posicionamento, não olhando a concorrente.', when: (a) => L(a, 'P2') === 4 },
+  { id: 'valor_cheio', icon: ICONE.cheio, nome: 'Valor cheio', blurb: 'Desconto é exceção com regra, não idioma.', when: (a) => L(a, 'P3') >= 3 },
+  { id: 'protocolo_nao_sessao', icon: ICONE.protocolo, nome: 'Protocolo, não sessão', blurb: 'O produto principal é plano, não sessão avulsa.', when: (a) => L(a, 'P4') === 4 },
+  { id: 'avaliacao_com_processo', icon: ICONE.avaliacao, nome: 'Avaliação com processo', blurb: 'Preço só entra depois do plano.', when: (a) => L(a, 'P6') === 4 },
+  { id: 'conteudo_que_abre_conversa', icon: ICONE.conversa, nome: 'Conteúdo que abre conversa', blurb: 'O Instagram fala de problema e resultado, não só de tabela.', when: (a) => L(a, 'P7') >= 3 },
+  { id: 'roteiro_do_oi_ao_pix', icon: ICONE.roteiro, nome: 'Roteiro do oi ao pix', blurb: 'O atendimento não depende do humor de quem pegou o celular.', when: (a) => L(a, 'C1') >= 3 },
+  { id: 'mede_a_taxa', icon: ICONE.medir, nome: 'Mede a taxa', blurb: 'Sabe quantas conversas viram avaliação e quantas viram protocolo.', when: (a) => L(a, 'C2') === 4 },
+  { id: 'followup_com_data', icon: ICONE.agendaFollow, nome: 'Follow-up com data', blurb: '"Vou pensar" entra numa sequência, não no limbo.', when: (a) => L(a, 'C3') >= 3 },
+  { id: 'uma_clinica_so', icon: ICONE.espelho, nome: 'Uma clínica só', blurb: 'Anúncio, recepção e avaliação prometem a mesma coisa.', when: (a) => L(a, 'C7') >= 3 },
+  { id: 'agenda_sem_depender_do_post', icon: ICONE.base, nome: 'Agenda sem depender do post', blurb: 'Sete dias sem postar e a agenda não sente.', when: (a) => L(a, 'CAP1') !== null && L(a, 'CAP1') <= 2 },
+  { id: 'sabe_a_origem', icon: ICONE.origem, nome: 'Sabe a origem', blurb: 'Cada paciente da semana tem canal registrado.', when: (a) => L(a, 'CAP2') === 4 },
+  { id: 'anuncio_com_proximo_passo', icon: ICONE.alvo, nome: 'Anúncio com próximo passo', blurb: 'Post e anúncio pedem avaliação, não só mostram resultado bonito.', when: (a) => L(a, 'CAP3') >= 3 },
+  { id: 'cobertura_real', icon: ICONE.relogio, nome: 'Cobertura real', blurb: 'O WhatsApp tem horário de cobertura, não "quando der".', when: (a) => L(a, 'WA1') >= 3 },
+  { id: 'followup_automatico', icon: ICONE.automatico, nome: 'Follow-up automático', blurb: 'Ninguém precisa lembrar de cobrar o "vou pensar".', when: (a) => L(a, 'WA3') >= 3 },
+  { id: 'closer_de_verdade', icon: ICONE.closer, nome: 'Closer de verdade', blurb: 'Alguém conduz protocolo de ticket alto sem te chamar.', when: (a) => S(a, 'S2') === 'sim' },
+  { id: 'comissao_por_protocolo', icon: ICONE.comissao, nome: 'Comissão por protocolo', blurb: 'Quem vende ganha quando fecha, não quando despacha.', when: (a) => S(a, 'S3') === 'fixo_protocolo' },
+  { id: 'lead_21h_vivo', icon: ICONE.noite, nome: 'Lead das 21h vivo', blurb: 'Fora de hora tem fluxo que segura a conversa e marca.', when: (a) => S(a, 'S5') === 'fluxo_marca' },
+  { id: 'lead_e_venda', icon: ICONE.metodo, nome: 'Lead é venda', blurb: 'A clínica trata lead como alguém a ser vendido com ética e processo.', when: (a) => S(a, 'S6') === 'vendida_com_processo' },
 ]
 
 // ---------------------------------------------------------------------------

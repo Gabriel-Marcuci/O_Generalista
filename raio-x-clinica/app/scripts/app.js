@@ -4,7 +4,7 @@
 import { avaliar, normalizar } from '../../lib/score.js'
 import { QUESTOES, answersVazio } from '../../lib/questions.js'
 import {
-  CONFIG, SECOES, LIKERT_OPCOES, EIXOS, faixa, COR_FAIXA,
+  CONFIG, SECOES, LIKERT_OPCOES, EIXOS, faixa, corFaixa,
   PERGUNTAS, OBRIGATORIAS, MENSAGENS_INTRO, MENSAGENS_DEPOIS, MENSAGENS_TRANSICAO_LEAD, ANALISE_FRASES,
   BADGES, PERSONA_FLAVOR, OFERTA_TITULOS, SELO_PRECO, SELO_PAPEL, notaEixo, swotDeterministico, NUMEROS_PEDIR,
 } from './flow.js'
@@ -364,9 +364,9 @@ function mesAno() {
 
 export function reportTemplate() {
   const radarLabel = (eixo, x, y, anchor, valueFirst) => {
-    const v = `<text x="${x}" y="${valueFirst ? y : y + 24}" font-size="20" font-weight="800" data-radar-value="${eixo.id}" fill="#F6F2E7">—</text>`
-    const l = `<text x="${x}" y="${valueFirst ? y + 24 : y}" font-size="11" font-weight="700" letter-spacing="2" fill="#F6F2E7" opacity=".8">${eixo.radar}</text>`
-    return `<g text-anchor="${anchor}" font-family="Figtree, system-ui, sans-serif">${v}${l}</g>`
+    const v = `<text x="${x}" y="${valueFirst ? y : y + 24}" font-size="20" font-weight="600" data-radar-value="${eixo.id}" >—</text>`
+    const l = `<text x="${x}" y="${valueFirst ? y + 24 : y}" font-size="10" font-weight="600" letter-spacing="1.6" opacity=".55">${eixo.radar}</text>`
+    return `<g text-anchor="${anchor}">${v}${l}</g>`
   }
   return `
   <div class="report__analyzing" data-analyzing hidden>
@@ -403,14 +403,14 @@ export function reportTemplate() {
     <div class="radar-card">
       <svg viewBox="0 0 500 460" role="img" aria-label="Radar dos 4 eixos: marca, captação, conversão e equipe">
         <defs data-radar-defs></defs>
-        <g fill="none" stroke="rgba(246,242,231,0.10)" stroke-width="1">
+        <g data-radar-grid fill="none" stroke-width="1">
           <polygon points="250,70 410,230 250,390 90,230"/><polygon points="250,110 370,230 250,350 130,230"/>
           <polygon points="250,150 330,230 250,310 170,230"/><polygon points="250,190 290,230 250,270 210,230"/>
         </g>
-        <g stroke="rgba(246,242,231,0.10)" stroke-width="1" stroke-dasharray="3,4"><line x1="250" y1="70" x2="250" y2="390"/><line x1="90" y1="230" x2="410" y2="230"/></g>
+        <g data-radar-grid stroke-width="1" stroke-dasharray="3,4"><line x1="250" y1="70" x2="250" y2="390"/><line x1="90" y1="230" x2="410" y2="230"/></g>
         <g fill-opacity="0.55" data-radar-quadrants></g>
         <g fill="none" stroke-width="2" stroke-linejoin="round" data-radar-edges></g>
-        <g stroke="#041B15" stroke-width="1.5" data-radar-points></g>
+        <g stroke-width="1.5" data-radar-points></g>
         ${radarLabel(EIXOS[0], 250, 28, 'middle', true)}
         ${radarLabel(EIXOS[1], 496, 222, 'end', false)}
         ${radarLabel(EIXOS[2], 250, 420, 'middle', false)}
@@ -439,7 +439,7 @@ export function reportTemplate() {
     <div class="section-head"><span class="section-num">02</span><h3>Condecorações</h3><span class="section-meta" data-badges-meta>0 conquistadas</span></div>
     <div class="badges-meta"><span class="badges-count" data-badges-count>0 / ${BADGES.length}</span></div>
     <div class="badge-grid" data-badges>
-      ${BADGES.map((b) => `<div class="badge locked" data-badge="${b.id}" data-tooltip="${esc(b.blurb)}" tabindex="0"><span class="badge__emoji" aria-hidden="true">${b.icon}</span><span class="badge__name">${esc(b.nome)}</span></div>`).join('')}
+      ${BADGES.map((b) => `<div class="badge locked" data-badge="${b.id}" data-tooltip="${esc(b.blurb)}" tabindex="0"><span class="badge__icon" aria-hidden="true">${b.icon}</span><span class="badge__name">${esc(b.nome)}</span></div>`).join('')}
     </div>
   </section>
 
@@ -486,7 +486,7 @@ function renderRadar(root, scores) {
     [cx, cy + maxR * (val('conversao') / 100)],
     [cx - maxR * (val('equipe_sistema') / 100), cy],
   ]
-  const cols = EIXOS.map((e) => COR_FAIXA[faixa(scores[e.id])])
+  const cols = EIXOS.map((e) => corFaixa(faixa(scores[e.id])))
   const grads = [[0, 1], [1, 2], [2, 3], [3, 0]]
   $('[data-radar-defs]', root).innerHTML = grads.map(([a, b], i) => `
     <linearGradient id="rg-${root.id}-${i}" gradientUnits="userSpaceOnUse" x1="${pts[a][0].toFixed(1)}" y1="${pts[a][1].toFixed(1)}" x2="${pts[b][0].toFixed(1)}" y2="${pts[b][1].toFixed(1)}">
@@ -499,7 +499,7 @@ function renderRadar(root, scores) {
   EIXOS.forEach((e, i) => {
     const t = $(`[data-radar-value="${e.id}"]`, root)
     t.textContent = scores[e.id] === null ? '—' : String(scores[e.id])
-    t.setAttribute('fill', scores[e.id] === null ? '#F6F2E7' : cols[i])
+    t.style.fill = scores[e.id] === null ? '' : cols[i]
   })
 }
 
@@ -732,6 +732,31 @@ function nudgeReport() {
   if (tab && !tab.classList.contains('is-active')) tab.classList.add('is-onboarding')
 }
 
+const TEMA_KEY = 'raio_x_tema'
+
+function setupTemas() {
+  const raiz = document.documentElement
+  let atual = raiz.dataset.tema || 'mono'
+  try { atual = localStorage.getItem(TEMA_KEY) || atual } catch (_) {}
+  aplicaTema(atual)
+  $$('[data-tema-btn]').forEach((b) => b.addEventListener('click', () => aplicaTema(b.dataset.temaBtn)))
+}
+
+function aplicaTema(t) {
+  document.documentElement.dataset.tema = t
+  $$('[data-tema-btn]').forEach((b) => {
+    const on = b.dataset.temaBtn === t
+    b.classList.toggle('is-active', on)
+    b.setAttribute('aria-pressed', String(on))
+  })
+  try { localStorage.setItem(TEMA_KEY, t) } catch (_) {}
+  // o radar pinta com as cores do tema: redesenha os dois cards
+  const r = currentResult()
+  if ($('#laudo')) renderReport($('#laudo'), r, { animate: false })
+  const prev = $('#laudo-preview')
+  if (prev && prev.dataset.pronto) redesenhaPreview()
+}
+
 function setupTabs() {
   $$('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
     const which = tab.dataset.tab
@@ -797,6 +822,13 @@ function setupTooltips() {
 // O laudo do preview é desenhado num container largo (2 colunas, como na impressão)
 // e reduzido por transform, pra caber inteiro: persona, radar, badges, SWOT e oferta.
 const PREVIEW_W = 1600
+let previewFixture = null
+
+function redesenhaPreview() {
+  const root = $('#laudo-preview')
+  if (!root || !previewFixture) return
+  renderReport(root, avaliar(previewFixture), { complete: true, revealed: true, animate: false, answers: normalizar(previewFixture).answers })
+}
 
 function ajustarPreview() {
   const frame = $('[data-preview-frame]')
@@ -822,6 +854,8 @@ async function renderPreview() {
   try {
     const fixture = window.__RAIOX_FIXTURE__ || await (await fetch('../lib/exemplo.secretaria-r500.json')).json()
     const r = avaliar(fixture)
+    previewFixture = fixture
+    root.dataset.pronto = '1'
     renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers })
     $('[data-footer-note]', root).textContent = 'Exemplo fictício. O seu sai com as suas respostas.'
     $$('[data-action]', root).forEach((b) => { b.disabled = true; b.removeAttribute('data-tooltip') })
@@ -866,6 +900,7 @@ function restore() {
 function init() {
   const had = load()
   $('#laudo').innerHTML = reportTemplate()
+  setupTemas()
   setupTabs()
   setupActions()
   setupTooltips()

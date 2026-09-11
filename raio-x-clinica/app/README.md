@@ -5,8 +5,31 @@ vai sendo preenchido em tempo real: identidade, radar de 4 eixos, barras, selos,
 condecorações. Persona sai quando as obrigatórias acabam. SWOT e oferta liberam depois
 do WhatsApp.
 
-Mesmo idioma visual da referência (papel quente + card forest/lime, Figtree), código próprio.
-Sem framework, sem build obrigatório. O motor roda no navegador (`../lib/score.js`).
+Estética minimalista tipo Apple: página clara e silenciosa, laudo em card escuro, cor
+só onde ela informa. Sem framework, sem build obrigatório. O motor roda no navegador
+(`../lib/score.js`).
+
+## Temas
+
+Dois temas prontos, definidos só por tokens em `styles/app.css`:
+
+| Tema | Atributo | Acento |
+|---|---|---|
+| Preto e branco (padrão) | `<html data-tema="mono">` | branco sobre preto |
+| Roxo | `<html data-tema="roxo">` | `#A78BFA` |
+
+O seletor no canto superior direito existe pra você comparar. Pra fixar um tema,
+apague o bloco `.temas` do `index.html` e deixe o `data-tema` que quiser no `<html>`.
+
+Nenhum componente usa cor literal: tudo passa por token, então um terceiro tema é só
+mais um bloco `[data-tema="x"]`. A página também responde a `prefers-color-scheme: dark`.
+
+**Cor é informação, não decoração.** As faixas do radar seguem os limiares do motor:
+≥65 acento cheio, ≥55 cinza, ≥40 âmbar, abaixo disso vermelho. Clínica saudável fica
+neutra; vermelho só aparece onde existe problema de verdade.
+
+Tipografia: SF do sistema em Apple, Inter no resto. Condecorações usam ícone de linha,
+não emoji.
 
 ```
 app/
@@ -40,7 +63,7 @@ Abre direto no navegador ou publica onde aceitar um HTML. Fonte vem do Google Fo
 - Ordem e texto das perguntas: `PERGUNTAS` (IDs do contrato em `lib/questions.js`). Versão atual = 27 obrigatórias + 2 bônus.
 - Mensagens entre perguntas: `MENSAGENS_DEPOIS` (string ou função que recebe a resposta e pode devolver `null`).
 - Condecorações: `BADGES` (18). Cada uma tem `when(answers, resultado)`.
-- Faixas de cor do radar seguem os limiares do motor: ≥65 lime, ≥55 sage, ≥40 âmbar, <40 vermelho.
+- Faixas de cor: `--tier-top`, `--tier-good`, `--tier-mid` e `--tier-low` em cada tema.
 
 ## O que é determinístico e o que vem do LLM
 
