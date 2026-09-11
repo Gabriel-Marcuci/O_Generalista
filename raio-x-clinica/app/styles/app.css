@@ -98,9 +98,11 @@ body[data-view="flow"] .view--flow { display: block; }
 }
 .intro__preview { margin: 0; position: relative; min-width: 0; }
 .intro__preview-btn { display: block; width: 100%; padding: 0; text-align: left; }
+/* O preview mostra o laudo inteiro: renderiza num container largo (2 colunas)
+   e reduz por transform. A altura do frame é medida no JS. */
 .intro__preview-frame {
   width: 100%;
-  max-height: min(760px, 78vh);
+  margin-inline: auto;
   border-radius: 16px;
   box-shadow: 0 24px 60px -20px rgba(0,0,0,.3), 0 6px 18px -8px rgba(0,0,0,.15);
   transform: rotate(-1.2deg);
@@ -109,13 +111,13 @@ body[data-view="flow"] .view--flow { display: block; }
   position: relative;
   background: var(--forest);
 }
-.intro__preview-frame::after {
-  content: '';
-  position: absolute; inset: auto 0 0 0; height: 140px;
-  background: linear-gradient(180deg, rgba(4,27,21,0) 0%, rgba(4,27,21,.92) 100%);
+.intro__preview-scaler {
+  width: var(--preview-w, 1600px);
+  transform-origin: top left;
+  transform: scale(var(--preview-scale, .4));
   pointer-events: none;
 }
-.intro__preview-frame .fsm-report { zoom: .58; pointer-events: none; border-radius: 22px; box-shadow: none; }
+.intro__preview-scaler .fsm-report { border-radius: 0; box-shadow: none; }
 .intro__preview-btn:hover .intro__preview-frame { transform: rotate(0deg) scale(1.01); }
 .intro__preview-btn:focus-visible { outline: none; }
 .intro__preview-btn:focus-visible .intro__preview-frame { outline: 2px solid var(--green-700); outline-offset: 4px; }
@@ -158,9 +160,8 @@ body[data-view="flow"] .view--flow { display: block; }
 @media (max-width: 880px) {
   .intro { grid-template-columns: 1fr; gap: 32px; }
   .intro__copy { order: -1; }
-  .intro__preview-btn { max-width: 480px; margin: 0 auto; }
+  .intro__preview-btn { max-width: 520px; margin: 0 auto; }
   .intro__preview-frame { transform: rotate(-.8deg); }
-  .intro__preview-frame .fsm-report { zoom: .6; }
 }
 
 /* ——— Progress ——— */
@@ -429,7 +430,18 @@ body[data-view="flow"] .view--flow { display: block; }
 .tagline__label { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--lime); font-style: italic; }
 .intro-meta { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); opacity: .55; }
 .intro-title { font-size: clamp(20px, 2.6vw, 28px); font-weight: 700; letter-spacing: -.015em; line-height: 1.2; margin: 0 0 24px; }
-.intro-body { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.intro-body { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: stretch; }
+/* Card largo (preview da intro, impressão): identidade e persona lado a lado,
+   radar ao lado das barras. Na coluna de 480px continua empilhado. */
+@container (min-width: 640px) {
+  .intro-body { grid-template-columns: 1fr 1fr; }
+  .swot-grid, .offer__grid { grid-template-columns: 1fr 1fr; }
+  .report__section--radar { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  .report__section--radar .section-head,
+  .report__section--radar .selos { grid-column: 1 / -1; }
+  .report__section--radar .radar-card { margin-bottom: 0; }
+  .badge-grid { grid-template-columns: repeat(6, 1fr); }
+}
 .profile { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .attr { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 14px; }
 .attr__icon { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--r-rule-strong); display: flex; align-items: center; justify-content: center; color: var(--lime); }

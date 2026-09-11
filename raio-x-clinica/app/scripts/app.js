@@ -398,7 +398,7 @@ export function reportTemplate() {
     </div>
   </header>
 
-  <section class="report__section">
+  <section class="report__section report__section--radar">
     <div class="section-head"><span class="section-num">01</span><h3>Radar</h3><span class="section-meta">4 eixos</span></div>
     <div class="radar-card">
       <svg viewBox="0 0 500 460" role="img" aria-label="Radar dos 4 eixos: marca, captação, conversão e equipe">
@@ -794,6 +794,27 @@ function setupTooltips() {
 
 // Preview da intro (fixture da Camila) ---------------------------------------
 
+// O laudo do preview é desenhado num container largo (2 colunas, como na impressão)
+// e reduzido por transform, pra caber inteiro: persona, radar, badges, SWOT e oferta.
+const PREVIEW_W = 1600
+
+function ajustarPreview() {
+  const frame = $('[data-preview-frame]')
+  const scaler = $('[data-preview-scaler]')
+  const card = $('#laudo-preview')
+  const figura = $('.intro__preview')
+  if (!frame || !scaler || !card || !figura) return
+  const alturaCard = card.offsetHeight
+  if (!alturaCard) return
+  // Cabe na largura da coluna e na dobra: o card aparece inteiro, sem corte.
+  const alturaMax = Math.min(760, innerHeight * 0.8)
+  const escala = Math.min(figura.clientWidth / PREVIEW_W, alturaMax / alturaCard)
+  scaler.style.setProperty('--preview-w', `${PREVIEW_W}px`)
+  scaler.style.setProperty('--preview-scale', escala)
+  frame.style.width = `${Math.round(PREVIEW_W * escala)}px`
+  frame.style.height = `${Math.round(alturaCard * escala)}px`
+}
+
 async function renderPreview() {
   const root = $('#laudo-preview')
   if (!root) return
@@ -807,6 +828,10 @@ async function renderPreview() {
   } catch (_) {
     renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio() })
   }
+  ajustarPreview()
+  if (window.ResizeObserver) new ResizeObserver(ajustarPreview).observe($('[data-preview-frame]'))
+  if (document.fonts?.ready) document.fonts.ready.then(ajustarPreview)
+  addEventListener('resize', ajustarPreview)
 }
 
 // Restaurar sessão ------------------------------------------------------------
