@@ -1,0 +1,9 @@
+# Dados de leads e laudos salvos — nunca versionar
+data/
+
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store

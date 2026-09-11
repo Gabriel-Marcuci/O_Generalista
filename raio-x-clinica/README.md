@@ -193,3 +193,47 @@ node app/build.mjs       # arquivo único em app/dist/raio-x.html
 ```
 
 Detalhes em `app/README.md`. A pasta `ui/` é o protótipo anterior só do card de resultado.
+
+---
+
+## API
+
+`npm start` (ou `npm run dev`) sobe `server.mjs` na porta `PORT` (default 8787). Serve `app/`, `lib/`, `ui/` e a API.
+Todos os handlers seguem o contrato Web Fetch (`Request → Response`) em `api/*.js`, com adaptador `nodeListener` — dá pra plugar em Vercel/Netlify/Cloudflare sem reescrever. Variáveis em `.env.example`.
+
+| Rota | Body | Resposta | Persiste |
+|---|---|---|---|
+| `POST /api/avaliar` | `answers` (raiz) | scores, flags, selos, oferta, payload. `?payload=1` só o payload | nada |
+| `POST /api/lead` | `{ lead:{ whatsapp, email?, em? }, answers, origem? }` | `{ ok, id, webhook: 'enviado' \| 'falhou' \| 'desligado' }` | linha em `data/leads.jsonl` |
+| `POST /api/laudo` | `{ answers }` ou `{ payload }` | `{ ok, laudo, motor, modelo, tentativas }` | nada |
+| `POST /api/salvar` | `{ answers, laudo?: object \| null }` | `{ ok, id, url: '/l/<id>' }` | `data/laudos/<id>.json` |
+| `GET /api/laudo/:id` | — | `{ ok, id, criado_em, answers, laudo, resumo }` ou 404 `nao_encontrado` | lê o arquivo acima |
+| `GET /l/:id` | — | `app/index.html` (o app lê o id da URL e chama `GET /api/laudo/:id`) | — |
+
+Erros: `400` body/whatsapp inválido · `405` método errado · `422` `answers` fora do contrato (com `issues`) · `503 sem_chave` sem `ANTHROPIC_API_KEY` · `502 llm_falhou` API do modelo caiu.
+
+**O que fica em disco.** Raiz = `RAIOX_DATA_DIR` ou `./data` (gitignored). Ids: 10 chars base36 via `crypto`, validados por `^[a-z0-9]{8,16}$` antes de tocar o disco.
+
+- `leads.jsonl` — uma linha por lead: `{ id, criado_em, lead:{ whatsapp (só dígitos), email?, em? }, resumo, answers, origem? }`.
+- `laudos/<id>.json` — `{ id, criado_em, answers, laudo, resumo }`.
+- `resumo` (igual nos dois): `{ nome, persona_sugerida, persona_titulo, scores, selos, oferta:{ principal, complementar, trafego_proibido_passo_1 }, flags }`.
+
+**Laudo pelo modelo (`lib/laudo-llm.js`).** System = `prompt-laudo.md`; user = `payload` do motor; pede só JSON. Valida com `validarLaudo()`; se divergir, refaz uma vez listando os erros; se ainda divergir, força `oferta.principal`, `persona`, `selo_preco`, `selo_papel` com os valores do motor e marca `observacao_motor = 'campos rígidos forçados pelo motor'`. Modelo em `LAUDO_MODEL` (default `claude-sonnet-5`). Só `fetch` nativo, sem SDK.
+
+**Webhook do lead.** Defina `LEAD_WEBHOOK_URL`. A cada `POST /api/lead` o servidor faz `POST` JSON `{ id, criado_em, lead, resumo, origem? }` pra essa URL (timeout 5s). Falha vira `webhook: 'falhou'` + log em stderr — o lead já está gravado no `leads.jsonl` de qualquer jeito.
+
+- **Zapier**: Webhooks by Zapier → *Catch Hook* → cole a URL. Campos chegam como `lead__whatsapp`, `resumo__oferta__principal` etc.
+- **Make**: módulo *Custom webhook* → cole a URL → mande um lead de teste pra ele reconhecer a estrutura.
+- **Planilha (Apps Script)**: publique como *Web app* um script com `doPost(e)` que faz `JSON.parse(e.postData.contents)` e `appendRow([...])`. Acesso "Qualquer pessoa"; use a URL `/exec`.
+
+Teste rápido sem chave:
+
+```sh
+PORT=8790 npm start &
+curl -s -X POST localhost:8790/api/lead -H 'content-type: application/json' \
+  -d "{\"lead\":{\"whatsapp\":\"11988887777\"},\"answers\":$(cat lib/exemplo.secretaria-r500.json)}"
+curl -s -X POST localhost:8790/api/salvar -H 'content-type: application/json' \
+  -d "{\"answers\":$(cat lib/exemplo.secretaria-r500.json)}"      # → { id, url:'/l/<id>' }
+curl -s localhost:8790/api/laudo/<id>                              # → arquivo salvo
+curl -s -X POST localhost:8790/api/laudo -d "{\"answers\":$(cat lib/exemplo.secretaria-r500.json)}"  # → 503 sem_chave
+```

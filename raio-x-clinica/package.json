@@ -6,8 +6,10 @@
   "description": "Motor de diagnóstico comercial de clínicas de estética: respostas do quiz → scores, flags, selos, oferta e payload do laudo.",
   "scripts": {
     "test": "node --test lib/*.test.js api/*.test.js",
+    "e2e": "node --test app/test/*.test.mjs",
     "exemplo": "node lib/cli.js lib/exemplo.secretaria-r500.json",
-    "dev": "node server.mjs"
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
   },
   "dependencies": {
     "zod": "^3.23.8"
