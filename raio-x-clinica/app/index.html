@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raio-X da Clínica</title>
+<meta name="description" content="Diagnóstico comercial de clínicas de estética, HOF e corporal. Radar de 4 eixos, selos de preço e papel, e a oferta certa pro seu caso.">
+<meta name="theme-color" content="#041B15">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23041b15'/%3E%3Cpolygon points='16,6 26,16 16,26 6,16' fill='none' stroke='%2389cc72' stroke-width='2.2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2389cc72'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="styles/app.css">
+</head>
+<body data-view="intro">
+
+<main class="site">
+
+  <!-- ===== VIEW: INTRO ===== -->
+  <section class="view view--intro" data-view="intro">
+    <div class="intro">
+      <figure class="intro__preview">
+        <button type="button" class="intro__preview-btn" data-action="start" aria-label="Começar o Raio-X">
+          <div class="intro__preview-frame">
+            <div class="fsm-report is-revealed" id="laudo-preview" aria-hidden="true"></div>
+          </div>
+        </button>
+      </figure>
+      <div class="intro__copy">
+        <p class="eyebrow">— raio-x da clínica</p>
+        <h1 class="title">Descubra onde a sua clínica perde dinheiro entre o "oi" e o protocolo</h1>
+        <p class="lede">Diagnóstico comercial pra clínica de estética, HOF e corporal em 4 eixos: <strong>marca</strong>, <strong>captação</strong>, <strong>conversão</strong> e <strong>equipe</strong>. Sai com selo de preço, selo de quem vende e a oferta certa pro seu caso.</p>
+        <ul class="meta">
+          <li><span aria-hidden="true">⏱</span> 8 minutos</li>
+          <li><span aria-hidden="true">✓</span> Laudo preenchido ao vivo</li>
+        </ul>
+        <button type="button" class="cta" data-action="start">Começar o Raio-X <span aria-hidden="true">→</span></button>
+        <p class="fineprint">Suas respostas só geram o seu laudo. Nada é compartilhado com terceiros.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW: FLOW (chat + laudo ao vivo) ===== -->
+  <section class="view view--flow" data-view="flow" aria-hidden="true">
+    <header class="progress" aria-label="Progresso">
+      <div class="progress__bar"><div class="progress__fill" data-progress-fill style="width:0%"></div></div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-active" data-tab="chat" role="tab" aria-selected="true">Conversa</button>
+      <button type="button" class="tab" data-tab="report" role="tab" aria-selected="false">Laudo <span class="tab__badge" data-tab-badge hidden></span></button>
+    </div>
+
+    <div class="layout">
+      <div class="chat is-active" data-pane="chat">
+        <ol class="stack" data-stack aria-live="polite"></ol>
+        <button type="button" class="reset" data-action="reset">Apagar respostas e recomeçar</button>
+      </div>
+      <aside class="report-col" data-pane="report" aria-label="Seu laudo em construção">
+        <div class="fsm-report" id="laudo"></div>
+      </aside>
+    </div>
+
+    <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+  </section>
+
+</main>
+
+<script type="module" src="scripts/app.js"></script>
+</body>
+</html>

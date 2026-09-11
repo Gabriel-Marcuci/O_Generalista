@@ -1,0 +1,2851 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raio-X da Clínica</title>
+<meta name="description" content="Diagnóstico comercial de clínicas de estética, HOF e corporal. Radar de 4 eixos, selos de preço e papel, e a oferta certa pro seu caso.">
+<meta name="theme-color" content="#041B15">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23041b15'/%3E%3Cpolygon points='16,6 26,16 16,26 6,16' fill='none' stroke='%2389cc72' stroke-width='2.2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2389cc72'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Raio-X da Clínica — folha própria no idioma visual da referência:
+   página em papel quente, chat à esquerda, laudo escuro (forest) fixo à direita. */
+
+:root {
+  /* Manual dotb (cores oficiais da referência, reaproveitadas como paleta) */
+  --abyss: #020E0A;
+  --forest: #041B15;
+  --canopy: #072B20;
+  --moss: #0D3D2C;
+  --fern: #1A5440;
+  --sage: #5E9F4E;
+  --lime: #89CC72;
+  --sprout: #A8E08F;
+  --linen: #F6F2E7;
+  --cloud: #EBF0F1;
+  --mist: #CDD5D7;
+  --slate: #9AADB0;
+  --warn: #D4A637;
+  --danger: #C44545;
+
+  /* Página clara */
+  --paper: oklch(97% 0.006 120);
+  --paper-warm: oklch(96% 0.015 90);
+  --white: #ffffff;
+  --ink-900: oklch(12% 0.015 150);
+  --ink-700: oklch(28% 0.02 150);
+  --ink-500: oklch(45% 0.015 150);
+  --ink-300: oklch(70% 0.01 150);
+  --card-border: oklch(88% 0.01 150);
+  --bar-track: oklch(94% 0.01 150);
+  --user-bubble: oklch(94% 0.07 140);
+  --user-bubble-border: oklch(86% 0.1 140);
+  --green-700: oklch(55% 0.16 145);
+  --green-900: oklch(32% 0.09 150);
+
+  --font-display: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: var(--font-display);
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --step--2: clamp(.69rem, .66rem + .15vw, .79rem);
+  --step--1: clamp(.83rem, .8rem + .17vw, .94rem);
+  --step-0: clamp(1rem, .96rem + .2vw, 1.13rem);
+  --step-1: clamp(1.2rem, 1.15rem + .25vw, 1.35rem);
+  --step-2: clamp(1.44rem, 1.37rem + .34vw, 1.62rem);
+  --step-5: clamp(2.49rem, 2.33rem + .82vw, 3.05rem);
+
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-card: 0 1px 0 rgba(0,0,0,.04), 0 8px 30px -12px rgba(0,0,0,.18);
+  --shadow-lg: 0 24px 60px -20px rgba(0,0,0,.35);
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --dur-fast: 180ms;
+  --dur-med: 320ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--ink-900);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--green-700); outline-offset: 3px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ——— Views ——— */
+.view { display: none; }
+body[data-view="intro"] .view--intro,
+body[data-view="flow"] .view--flow { display: block; }
+
+.site {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-block: clamp(20px, 4vw, 40px);
+  padding-inline: 16px;
+}
+
+/* ——— Intro ——— */
+.intro {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: clamp(8px, 3vw, 40px) 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+.intro__preview { margin: 0; position: relative; min-width: 0; }
+.intro__preview-btn { display: block; width: 100%; padding: 0; text-align: left; }
+.intro__preview-frame {
+  width: 100%;
+  max-height: min(760px, 78vh);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -20px rgba(0,0,0,.3), 0 6px 18px -8px rgba(0,0,0,.15);
+  transform: rotate(-1.2deg);
+  transition: transform var(--dur-med) var(--ease-out);
+  overflow: hidden;
+  position: relative;
+  background: var(--forest);
+}
+.intro__preview-frame::after {
+  content: '';
+  position: absolute; inset: auto 0 0 0; height: 140px;
+  background: linear-gradient(180deg, rgba(4,27,21,0) 0%, rgba(4,27,21,.92) 100%);
+  pointer-events: none;
+}
+.intro__preview-frame .fsm-report { zoom: .58; pointer-events: none; border-radius: 22px; box-shadow: none; }
+.intro__preview-btn:hover .intro__preview-frame { transform: rotate(0deg) scale(1.01); }
+.intro__preview-btn:focus-visible { outline: none; }
+.intro__preview-btn:focus-visible .intro__preview-frame { outline: 2px solid var(--green-700); outline-offset: 4px; }
+.intro__copy { max-width: 480px; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--ink-500);
+  margin: 0 0 20px;
+  letter-spacing: .02em;
+}
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--step-5);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.lede { font-size: var(--step-0); line-height: 1.55; color: var(--ink-700); margin: 0 0 28px; max-width: 34em; }
+.lede strong { color: var(--ink-900); font-weight: 700; }
+.meta { list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--step--1); color: var(--ink-500); }
+.meta li { display: inline-flex; align-items: center; gap: 6px; }
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink-900);
+  color: var(--paper);
+  padding: 14px 24px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+.cta:hover { transform: translateY(-1px); background: var(--green-900); }
+.fineprint { margin: 20px 0 0; font-size: var(--step--2); color: var(--ink-500); max-width: 40em; }
+
+@media (max-width: 880px) {
+  .intro { grid-template-columns: 1fr; gap: 32px; }
+  .intro__copy { order: -1; }
+  .intro__preview-btn { max-width: 480px; margin: 0 auto; }
+  .intro__preview-frame { transform: rotate(-.8deg); }
+  .intro__preview-frame .fsm-report { zoom: .6; }
+}
+
+/* ——— Progress ——— */
+.progress {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--paper-warm);
+  padding: 11px 16px;
+  margin: -16px -16px 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+.progress__bar { width: min(820px, 100%); margin: 0 auto; height: 5px; background: var(--bar-track); border-radius: var(--radius-pill); overflow: hidden; }
+.progress__fill { height: 100%; width: 0; background: var(--ink-900); border-radius: inherit; transition: width 700ms var(--ease-out); }
+
+/* ——— Tabs (mobile) ——— */
+.tabs { display: none; }
+@media (max-width: 880px) {
+  .tabs {
+    display: flex;
+    width: 100%;
+    margin: 0 auto 20px;
+    gap: 6px;
+    background: var(--white);
+    padding: 4px;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    position: sticky;
+    top: 48px;
+    z-index: 9;
+    box-shadow: 0 8px 16px -12px rgba(0,0,0,.25);
+  }
+}
+.tab {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--ink-500);
+  position: relative;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.tab.is-active { background: var(--ink-900); color: var(--paper); }
+.tab__badge {
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--lime); color: var(--forest);
+  font-size: 11px; font-weight: 800; line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.tab.is-flashing:not(.is-active) { animation: tab-flash 1.2s ease-out; }
+.tab.is-onboarding:not(.is-active) { animation: tab-pulse 1.6s ease-in-out infinite; }
+@keyframes tab-flash { 0% { background: var(--user-bubble); } 100% { background: transparent; } }
+@keyframes tab-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(137,204,114,0); } 50% { box-shadow: 0 0 0 4px rgba(137,204,114,.45); } }
+
+/* ——— Layout do fluxo ——— */
+.layout {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 480px;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: start;
+}
+.chat { min-width: 0; padding-bottom: 30vh; }
+.report-col {
+  position: sticky;
+  top: 44px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(246,242,231,.18) transparent;
+  padding-bottom: 8px;
+}
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .report-col { position: static; max-height: none; }
+  [data-pane] { display: none; }
+  [data-pane].is-active { display: block; }
+  .chat { padding-bottom: 18vh; }
+}
+@media (min-width: 881px) { [data-pane] { display: block; } }
+
+/* ——— Chat ——— */
+.stack { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.bubble { opacity: 0; transform: translateY(8px); transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+.bubble.is-in { opacity: 1; transform: translateY(0); }
+.bubble--bot, .bubble--typing { align-self: flex-start; max-width: 92%; display: flex; align-items: flex-start; gap: 8px; }
+.bubble__avatar {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--lime);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px;
+  box-shadow: inset 0 0 0 2px rgba(137,204,114,.35);
+}
+.bubble__text {
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: 14px 14px 14px 2px;
+  padding: 10px 16px;
+  box-shadow: var(--shadow-xs);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  min-width: 0;
+}
+.bubble__text strong { font-weight: 700; }
+.bubble--user {
+  align-self: flex-end;
+  max-width: 92%;
+  padding: 12px 18px;
+  background: var(--user-bubble);
+  border: 1px solid var(--user-bubble-border);
+  border-radius: 18px 18px 4px 18px;
+  font-weight: 500;
+  line-height: 1.45;
+  display: inline-flex; align-items: flex-start; gap: 10px;
+}
+.bubble--user .bubble__text { background: transparent; border: 0; border-radius: 0; box-shadow: none; padding: 0; }
+.bubble__edit {
+  flex-shrink: 0; width: 26px; height: 26px; margin: -2px -6px 0 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-pill);
+  color: oklch(35% .06 140); opacity: .4; font-size: 14px;
+  transition: opacity .15s, background .15s;
+}
+.bubble__edit:hover, .bubble__edit:focus-visible { opacity: 1; background: var(--user-bubble-border); }
+.bubble--typing .bubble__text { display: inline-flex; gap: 5px; align-items: center; padding: 12px 16px; }
+.bubble--typing .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-500); opacity: .5; animation: typing 1.3s infinite ease-in-out; }
+.bubble--typing .dot:nth-child(2) { animation-delay: .18s; }
+.bubble--typing .dot:nth-child(3) { animation-delay: .36s; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+.bubble--question { align-self: stretch; margin-top: 8px; }
+.q { display: flex; flex-direction: column; gap: 8px; }
+.q--card { background: var(--white); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px 18px 14px; box-shadow: var(--shadow-card); }
+.q__section {
+  display: inline-block; width: fit-content;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--ink-500);
+  padding: 2px 8px; border-radius: var(--radius-pill); background: var(--bar-track);
+}
+.q__prompt { font-size: var(--step-0); font-weight: 500; line-height: 1.45; margin: 0 0 4px; }
+.q__options { display: flex; flex-direction: column; gap: 5px; }
+.q__option {
+  display: flex; align-items: center; gap: 10px;
+  text-align: left; width: 100%;
+  padding: 9px 14px;
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--ink-700);
+  transition: border-color var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+.q__option:hover { border-color: var(--ink-700); color: var(--ink-900); }
+.q__option[aria-pressed="true"] { border-color: var(--ink-900); background: var(--ink-900); color: var(--paper); }
+.q__scale {
+  width: 22px; height: 22px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 6px; background: var(--bar-track);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink-700);
+}
+.q__option[aria-pressed="true"] .q__scale { background: rgba(255,255,255,.14); color: var(--paper); }
+.q__options--likert { display: grid; grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .q__options--likert { grid-template-columns: 1fr; } }
+.q__input {
+  width: 100%;
+  font: inherit; font-size: var(--step-0);
+  padding: 10px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: var(--white); color: var(--ink-900);
+  transition: border-color var(--dur-fast);
+}
+.q__input:focus { outline: none; border-color: var(--ink-900); }
+.q__nav { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 8px 0 0; }
+.q__nav--end { justify-content: flex-end; }
+.q__btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--step--1); font-weight: 600;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.q__btn--ghost { color: var(--ink-500); padding: 8px 10px; }
+.q__btn--ghost:hover { color: var(--ink-900); }
+.q__btn--primary { background: var(--ink-900); color: var(--paper); border-color: var(--ink-900); }
+.q__btn--primary:hover:not(:disabled) { background: var(--green-900); border-color: var(--green-900); }
+.q__btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.lead { display: flex; flex-direction: column; gap: 12px; }
+.lead__field { display: flex; flex-direction: column; gap: 4px; }
+.lead__field > span { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-700); }
+.lead__field input { padding: 10px 12px; border: 1px solid var(--card-border); border-radius: 8px; font: inherit; background: var(--white); color: var(--ink-900); }
+.lead__field input:focus { outline: 2px solid var(--green-700); outline-offset: 1px; }
+.lead__error { margin: 0; color: oklch(50% .18 25); font-size: var(--step--1); }
+.lead__fine { margin: 0; font-size: var(--step--2); color: var(--ink-500); }
+
+/* ——— Toast ——— */
+.toast {
+  position: fixed; top: 24px; right: 24px; z-index: 100;
+  background: var(--ink-900); color: var(--paper);
+  padding: 14px 18px; border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 12px;
+  max-width: min(320px, calc(100vw - 32px));
+  transform: translateX(calc(100% + 32px));
+  transition: transform 400ms var(--ease-out);
+}
+.toast.is-visible { transform: translateX(0); }
+.toast[hidden] { display: none !important; }
+.toast__icon { font-size: 22px; }
+.toast__body { font-size: var(--step--1); line-height: 1.3; }
+.toast__title { font-weight: 700; display: block; }
+.toast__blurb { font-size: 11px; opacity: .75; font-family: var(--font-mono); }
+
+/* ==========================================================================
+   LAUDO (fsm-report) — forest 70%, canopy 20%, lime 10%
+   ========================================================================== */
+.fsm-report {
+  --r-rule: rgba(246,242,231,.08);
+  --r-rule-strong: rgba(246,242,231,.16);
+  --r-radius: 14px;
+  --r-pad: clamp(20px, 3vw, 36px);
+  width: 100%;
+  background: var(--forest);
+  color: var(--cloud);
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -.005em;
+  padding: var(--r-pad);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.3);
+  position: relative;
+  container-type: inline-size;
+}
+.fsm-report::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 320px; height: 320px;
+  background: radial-gradient(circle at top right, rgba(137,204,114,.10), transparent 65%);
+  pointer-events: none; border-top-right-radius: inherit;
+}
+.fsm-report > * { position: relative; }
+.fsm-report h2, .fsm-report h3 { margin: 0; color: var(--linen); font-family: inherit; }
+.fsm-report.is-nudge { animation: nudge 1200ms ease-out; }
+@keyframes nudge { 0% { box-shadow: 0 0 0 0 rgba(137,204,114,0), 0 12px 32px rgba(0,0,0,.3); } 40% { box-shadow: 0 0 0 6px rgba(137,204,114,.45), 0 12px 32px rgba(0,0,0,.3); } 100% { box-shadow: 0 0 0 0 rgba(137,204,114,0), 0 12px 32px rgba(0,0,0,.3); } }
+
+.report__analyzing { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.report__analyzing[hidden] { display: none; }
+.report__pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 999px; background: var(--canopy); border: 1px solid var(--r-rule-strong); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); }
+.report__pill-dot { animation: blink 1.1s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+.report__pill-sub { font-size: 12.5px; color: var(--mist); opacity: .8; font-style: italic; }
+
+.report__intro { padding-bottom: 24px; margin-bottom: 24px; }
+.intro-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.tagline { display: inline-flex; align-items: center; gap: 12px; }
+.tagline__rule { width: 28px; height: 2px; background: var(--lime); }
+.tagline__label { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--lime); font-style: italic; }
+.intro-meta { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); opacity: .55; }
+.intro-title { font-size: clamp(20px, 2.6vw, 28px); font-weight: 700; letter-spacing: -.015em; line-height: 1.2; margin: 0 0 24px; }
+.intro-body { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.profile { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.attr { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 14px; }
+.attr__icon { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--r-rule-strong); display: flex; align-items: center; justify-content: center; color: var(--lime); }
+.attr__icon svg { width: 13px; height: 13px; }
+.attr__body { min-width: 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.attr__key { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--mist); opacity: .5; width: 62px; flex-shrink: 0; }
+.attr__val { font-size: 14px; font-weight: 600; color: var(--linen); line-height: 1.25; flex: 1; min-width: 0; }
+.attr__val[data-empty] { color: var(--mist); opacity: .35; font-style: italic; font-weight: 500; }
+.is-flashing { animation: field-flash 720ms ease-out; }
+@keyframes field-flash { 0% { color: var(--lime); transform: translateX(-2px); } 50% { color: var(--sprout); } 100% { transform: translateX(0); } }
+
+.trophy {
+  background: var(--lime);
+  border-radius: var(--r-radius);
+  padding: 22px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 0 0 1px rgba(137,204,114,.3), 0 12px 32px rgba(137,204,114,.12);
+  color: var(--forest);
+}
+.trophy__head { display: flex; align-items: center; gap: 12px; }
+.trophy__label { font-size: 10px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; opacity: .7; }
+.trophy__rule { flex: 1; height: 1px; background: var(--forest); opacity: .2; }
+.trophy__body { display: flex; align-items: center; gap: 18px; }
+.trophy__emblem { width: 56px; height: 56px; border-radius: 50%; background: var(--forest); color: var(--lime); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: inset 0 0 0 2px rgba(137,204,114,.4); }
+.trophy__name { font-size: clamp(18px, 2.2vw, 24px); font-weight: 800; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; font-style: italic; }
+.trophy__name.is-pending { opacity: .4; text-transform: none; font-weight: 600; letter-spacing: 0; }
+.trophy__name.is-revealing { animation: trophy-reveal 600ms ease-out; }
+@keyframes trophy-reveal { 0% { transform: scale(.92); opacity: 0; } 60% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); } }
+.trophy__flavor { font-size: 13px; line-height: 1.55; opacity: .8; font-style: italic; margin: 0; }
+
+.report__section { margin-bottom: 36px; }
+.report__section:last-of-type { margin-bottom: 0; }
+.section-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; margin-bottom: 22px; border-bottom: 1px solid var(--r-rule); }
+.section-num { font-size: 11px; font-weight: 600; color: var(--lime); letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+.section-head h3 { font-size: clamp(17px, 2vw, 22px); font-weight: 700; letter-spacing: -.01em; }
+.section-meta { margin-left: auto; font-size: 10px; color: var(--mist); opacity: .5; letter-spacing: .12em; text-transform: uppercase; }
+
+.radar-card { background: var(--canopy); border: 1px solid var(--r-rule); border-radius: var(--r-radius); padding: 18px; margin-bottom: 18px; }
+.radar-card svg { width: 100%; max-width: 460px; height: auto; margin: 0 auto; overflow: visible; }
+
+.scores { display: flex; flex-direction: column; gap: 10px; }
+.score {
+  display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: center;
+  padding: 14px 16px;
+  background: var(--canopy); border: 1px solid var(--r-rule); border-radius: 8px;
+  position: relative;
+}
+.score__icon { width: 32px; height: 32px; border-radius: 50%; background: var(--moss); display: flex; align-items: center; justify-content: center; color: var(--lime); }
+.score__icon svg { width: 16px; height: 16px; }
+.score__body { min-width: 0; }
+.score__label { font-size: 13.5px; font-weight: 700; color: var(--linen); margin-bottom: 6px; }
+.score__bar { height: 12px; background: var(--canopy); border: 1px solid rgba(26,84,64,.55); border-radius: 999px; overflow: hidden; }
+.score__fill { height: 100%; background: var(--fern); border-radius: 999px; transition: width 480ms var(--ease-out), background 300ms; }
+.score__note { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--mist); opacity: .78; }
+.score__note.is-pending { font-style: italic; opacity: .4; }
+.score__value { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--linen); }
+.score.is-top .score__icon { background: rgba(137,204,114,.18); color: var(--lime); }
+.score.is-good .score__icon { background: rgba(94,159,78,.2); color: var(--sage); }
+.score.is-mid .score__icon { background: rgba(212,166,55,.18); color: var(--warn); }
+.score.is-low .score__icon { background: rgba(196,69,69,.18); color: var(--danger); }
+.score.is-top .score__fill { background: var(--lime); box-shadow: 0 0 12px rgba(137,204,114,.32); }
+.score.is-good .score__fill { background: var(--sage); box-shadow: 0 0 12px rgba(94,159,78,.32); }
+.score.is-mid .score__fill { background: var(--warn); box-shadow: 0 0 12px rgba(212,166,55,.32); }
+.score.is-low .score__fill { background: var(--danger); box-shadow: 0 0 12px rgba(196,69,69,.32); }
+.score.is-top .score__value { color: var(--lime); }
+.score.is-good .score__value { color: var(--sage); }
+.score.is-mid .score__value { color: var(--warn); }
+.score.is-low .score__value { color: var(--danger); }
+
+.selos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.selo { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--r-rule-strong); background: var(--canopy); font-size: 12px; }
+.selo__key { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--mist); opacity: .6; }
+.selo__val { font-weight: 700; color: var(--linen); }
+.selo.is-pending .selo__val { color: var(--mist); opacity: .4; font-style: italic; font-weight: 500; }
+.selo.is-top { border-color: rgba(137,204,114,.5); } .selo.is-top .selo__val { color: var(--lime); }
+.selo.is-mid { border-color: rgba(212,166,55,.5); } .selo.is-mid .selo__val { color: var(--warn); }
+.selo.is-low { border-color: rgba(196,69,69,.5); } .selo.is-low .selo__val { color: var(--danger); }
+
+.badges-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.badges-count { background: var(--lime); color: var(--forest); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+@container (max-width: 380px) { .badge-grid { grid-template-columns: repeat(2, 1fr); } }
+.badge {
+  background: rgba(137,204,114,.06);
+  border: 1px solid rgba(137,204,114,.5);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 36px;
+  cursor: help;
+  position: relative;
+}
+.badge.locked { background: transparent; border-color: var(--fern); opacity: .45; }
+.badge__emoji { font-size: 14px; line-height: 1; flex-shrink: 0; }
+.badge.locked .badge__emoji { filter: grayscale(.5); opacity: .7; }
+.badge__name { font-size: 11px; font-weight: 600; color: var(--cloud); line-height: 1.2; }
+.badge.locked .badge__name { color: var(--slate); font-weight: 500; }
+.badge.is-revealing { animation: badge-unlock 720ms var(--ease-out); }
+@keyframes badge-unlock { 0% { transform: scale(.85); box-shadow: 0 0 0 4px rgba(137,204,114,0); } 50% { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(137,204,114,.45); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(137,204,114,0); } }
+
+[data-tooltip] { position: relative; }
+[data-tooltip]:hover::after, [data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 10px); left: 50%;
+  transform: translateX(calc(-50% + var(--tt-offset, 0px)));
+  background: var(--moss); color: var(--linen);
+  border: 1px solid rgba(137,204,114,.45);
+  font-family: var(--font-display); font-size: 11.5px; font-weight: 500; line-height: 1.4;
+  letter-spacing: 0; text-transform: none;
+  padding: 8px 12px; border-radius: 8px;
+  width: max-content; max-width: 240px; text-align: center;
+  box-shadow: 0 10px 28px rgba(0,0,0,.5);
+  pointer-events: none; z-index: 50;
+  animation: tooltip-in 160ms ease-out forwards;
+}
+@keyframes tooltip-in { from { opacity: 0; transform: translateX(calc(-50% + var(--tt-offset, 0px))) translateY(4px); } to { opacity: 1; } }
+
+.swot-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@container (min-width: 520px) { .swot-grid { grid-template-columns: 1fr 1fr; } }
+.swot { background: var(--canopy); border: 1px solid rgba(26,84,64,.5); border-radius: 10px; padding: 22px 24px 24px; }
+.swot.is-positive { --r-swot: var(--lime); }
+.swot.is-negative { --r-swot: var(--danger); }
+.swot.is-opportunity { --r-swot: var(--sage); }
+.swot.is-alert { --r-swot: var(--warn); }
+.swot__head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid var(--r-swot); }
+.swot__icon { width: 26px; height: 26px; border-radius: 50%; background: var(--r-swot); color: var(--forest); display: flex; align-items: center; justify-content: center; }
+.swot__icon svg { width: 14px; height: 14px; }
+.swot__title { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--linen); }
+.swot__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.swot__list li { font-size: 12.5px; line-height: 1.45; color: var(--cloud); opacity: .86; padding-left: 14px; position: relative; }
+.swot__list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--r-swot); }
+.swot__list li.is-pending, .offer__pending { font-style: italic; color: var(--mist); opacity: .45; }
+.swot__list li.is-pending::before { background: var(--fern); }
+.offer__pending { margin: 0; font-size: 12.5px; }
+
+.report__section--gated { position: relative; }
+.fsm-report:not(.is-revealed) .report__section--gated .swot-grid,
+.fsm-report:not(.is-revealed) .report__section--gated .offer { filter: saturate(.6); }
+
+.offer { display: flex; flex-direction: column; gap: 12px; }
+.offer__main { background: var(--lime); color: var(--forest); border-radius: var(--r-radius); padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+.offer__kicker { font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+.offer__title { font-size: clamp(18px, 2.2vw, 22px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.offer__copy { margin: 0; font-size: 14px; line-height: 1.5; font-style: italic; opacity: .9; }
+.offer__chip { display: inline-flex; width: fit-content; padding: 4px 10px; border-radius: 999px; background: var(--forest); color: var(--lime); font-size: 11px; font-weight: 700; margin-top: 4px; }
+.offer__chip--warn { background: var(--danger); color: var(--linen); }
+.offer__grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@container (min-width: 520px) { .offer__grid { grid-template-columns: 1fr 1fr; } }
+.offer__block, .offer__numbers { background: var(--canopy); border: 1px solid rgba(26,84,64,.5); border-radius: 10px; padding: 16px 18px; }
+.offer__block .offer__kicker, .offer__numbers .offer__kicker { color: var(--lime); opacity: 1; display: block; margin-bottom: 6px; }
+.offer__block p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--cloud); opacity: .9; }
+.offer__numbers ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--cloud); display: flex; flex-direction: column; gap: 4px; }
+
+.report__footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--r-rule); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.footer-note { font-size: 11px; color: var(--mist); opacity: .55; max-width: 32em; }
+.report__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-act {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 999px;
+  border: 1px solid rgba(137,204,114,.6); color: var(--lime);
+  font-size: 12.5px; font-weight: 700;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.btn-act:hover:not(:disabled) { background: rgba(137,204,114,.12); }
+.btn-act--primary { background: var(--lime); color: var(--forest); border-color: var(--lime); }
+.btn-act--primary:hover:not(:disabled) { background: var(--sprout); }
+.btn-act:disabled { opacity: .4; cursor: help; }
+
+.reset { align-self: flex-start; margin-top: 12px; font-size: var(--step--2); color: var(--ink-500); text-decoration: underline; }
+
+/* ——— Print: só o laudo ——— */
+@media print {
+  body { background: #fff; }
+  .progress, .tabs, .chat, .toast, .reset, .view--intro { display: none !important; }
+  .layout { display: block; width: 100%; }
+  .report-col { position: static; max-height: none; overflow: visible; }
+  .fsm-report { box-shadow: none; border-radius: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .report__actions { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+</style>
+</head>
+<body data-view="intro">
+
+<main class="site">
+
+  <!-- ===== VIEW: INTRO ===== -->
+  <section class="view view--intro" data-view="intro">
+    <div class="intro">
+      <figure class="intro__preview">
+        <button type="button" class="intro__preview-btn" data-action="start" aria-label="Começar o Raio-X">
+          <div class="intro__preview-frame">
+            <div class="fsm-report is-revealed" id="laudo-preview" aria-hidden="true"></div>
+          </div>
+        </button>
+      </figure>
+      <div class="intro__copy">
+        <p class="eyebrow">— raio-x da clínica</p>
+        <h1 class="title">Descubra onde a sua clínica perde dinheiro entre o "oi" e o protocolo</h1>
+        <p class="lede">Diagnóstico comercial pra clínica de estética, HOF e corporal em 4 eixos: <strong>marca</strong>, <strong>captação</strong>, <strong>conversão</strong> e <strong>equipe</strong>. Sai com selo de preço, selo de quem vende e a oferta certa pro seu caso.</p>
+        <ul class="meta">
+          <li><span aria-hidden="true">⏱</span> 8 minutos</li>
+          <li><span aria-hidden="true">✓</span> Laudo preenchido ao vivo</li>
+        </ul>
+        <button type="button" class="cta" data-action="start">Começar o Raio-X <span aria-hidden="true">→</span></button>
+        <p class="fineprint">Suas respostas só geram o seu laudo. Nada é compartilhado com terceiros.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW: FLOW (chat + laudo ao vivo) ===== -->
+  <section class="view view--flow" data-view="flow" aria-hidden="true">
+    <header class="progress" aria-label="Progresso">
+      <div class="progress__bar"><div class="progress__fill" data-progress-fill style="width:0%"></div></div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-active" data-tab="chat" role="tab" aria-selected="true">Conversa</button>
+      <button type="button" class="tab" data-tab="report" role="tab" aria-selected="false">Laudo <span class="tab__badge" data-tab-badge hidden></span></button>
+    </div>
+
+    <div class="layout">
+      <div class="chat is-active" data-pane="chat">
+        <ol class="stack" data-stack aria-live="polite"></ol>
+        <button type="button" class="reset" data-action="reset">Apagar respostas e recomeçar</button>
+      </div>
+      <aside class="report-col" data-pane="report" aria-label="Seu laudo em construção">
+        <div class="fsm-report" id="laudo"></div>
+      </aside>
+    </div>
+
+    <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+  </section>
+
+</main>
+
+<script>window.__RAIOX_FIXTURE__ = {
+  "lead": {
+    "nome": "Camila",
+    "papel": "dona_atende",
+    "foco": "hof",
+    "porte": "uma_unidade_pequena",
+    "objetivo": "subir_ticket"
+  },
+  "roteamento": {
+    "agenda": "folgada",
+    "problemas": ["pouca_gente", "nao_fecha"],
+    "quem_responde_digital": "secretaria",
+    "orcamento": "de_3k_a_8k"
+  },
+  "likert": {
+    "P1": 1, "P2": 1, "P3": 1, "P4": 2, "P5": 1, "P6": 2, "P7": 2, "P8": 2,
+    "C1": 1, "C2": 1, "C3": 1, "C4": 2, "C5": 2, "C6": 1, "C7": 2,
+    "CAP1": 4, "CAP2": 3, "CAP3": 2, "CAP4": 1, "CAP5": 1,
+    "WA1": 2, "WA2": 2, "WA3": 1
+  },
+  "categoricas": {
+    "S1": "informar_valores",
+    "S2": "so_tabela",
+    "S3": "fixo_sem_comissao",
+    "S4": "ate_800",
+    "S5": "manda_valor",
+    "S6": "quer_informacao",
+    "WA4": "nao"
+  },
+  "livres": {
+    "procedimento_mais_vende": "limpeza de pele",
+    "procedimento_quer_vender": "bioestimulador",
+    "notas_livres": ""
+  }
+};</script>
+<script>
+// ---- lib/questions.js
+// Contrato dos IDs do quiz Raio-X da Clínica.
+// O front grava as respostas exatamente neste shape. O motor (score.js) lê daqui.
+//
+// Shape de `answers`:
+// {
+//   lead:        { nome, papel, foco, porte?, objetivo? },
+//   roteamento:  { agenda, problemas: [..máx 2], quem_responde_digital, orcamento },
+//   likert:      { P1..P8, C1..C7, CAP1..CAP5, WA1..WA3 }   // 1 a 4
+//   categoricas: { S1..S6, WA4 },
+//   livres:      { procedimento_mais_vende, procedimento_quer_vender, notas_livres }
+// }
+
+const LIKERT_ESCALA = {
+  1: 'não acontece / não sei',
+  2: 'às vezes, no improviso',
+  3: 'acontece, mas sem controle',
+  4: 'é regra da clínica',
+}
+
+// Likert 1–4 vira 0 / 33 / 67 / 100.
+const LIKERT_PONTOS = { 1: 0, 2: 33, 3: 67, 4: 100 }
+
+const QUESTOES = {
+  lead: {
+    nome: { tipo: 'texto', texto: 'Seu primeiro nome' },
+    papel: {
+      id: 'R1',
+      tipo: 'opcao',
+      texto: 'Qual descreve melhor o seu papel hoje?',
+      opcoes: {
+        dona_atende: 'Sou dona/sócia e também atendo',
+        dona_nao_atende: 'Sou dona/sócia e quase não atendo mais',
+        profissional_responsavel: 'Sou a profissional responsável pela clínica',
+        gestao_atendimento: 'Cuido da gestão/atendimento (não faço procedimento)',
+      },
+    },
+    foco: {
+      id: 'R2',
+      tipo: 'opcao',
+      texto: 'O que a clínica mais faz hoje?',
+      opcoes: {
+        facial: 'Estética facial',
+        hof: 'Harmonização / HOF',
+        corporal: 'Corporal',
+        facial_corporal: 'Facial + corporal',
+        misto: 'Um pouco de tudo',
+      },
+    },
+    porte: {
+      tipo: 'opcao',
+      opcional: true,
+      texto: 'Porte da clínica',
+      opcoes: {
+        sozinha: 'Só eu',
+        uma_unidade_pequena: 'Uma unidade pequena',
+        clinica_com_equipe: 'Clínica com equipe',
+        expansao: 'Em expansão / mais de uma unidade',
+      },
+    },
+    objetivo: {
+      tipo: 'opcao',
+      opcional: true,
+      texto: 'Objetivo principal nos próximos 6 meses',
+      opcoes: {
+        encher_agenda: 'Encher a agenda',
+        subir_ticket: 'Subir o ticket',
+        parar_de_atender_sozinha: 'Parar de atender sozinha',
+        segunda_unidade: 'Abrir a segunda unidade',
+        padronizar_equipe: 'Padronizar a equipe',
+      },
+    },
+  },
+
+  roteamento: {
+    agenda: {
+      id: 'R3',
+      tipo: 'opcao',
+      texto: 'Como está a agenda neste momento?',
+      opcoes: {
+        folgada: 'Folgada — preciso de mais paciente',
+        oscila: 'Oscila: um mês cheia, outro morta',
+        cheia_avaliacao_pouco_fecha: 'Cheia de avaliação, pouco procedimento fechado',
+        cheia_caixa_nao_reflete: 'Cheia de procedimento, mas o caixa não reflete',
+        cheia_no_limite: 'Cheia e eu estou no limite',
+      },
+    },
+    problemas: {
+      id: 'R4',
+      tipo: 'multi',
+      max: 2,
+      texto: 'Qual é o principal problema agora? (máx. 2)',
+      opcoes: {
+        pouca_gente: 'Pouca gente chegando',
+        nao_fecha: 'Chega gente e não fecha',
+        fecha_barato: 'Fecha barato / dá muito desconto',
+        paciente_some: 'Paciente some depois da primeira sessão',
+        whatsapp_nao_da_conta: 'Eu (ou a equipe) não dou conta do WhatsApp',
+        nao_sei_priorizar: 'Não sei o que priorizar',
+      },
+    },
+    quem_responde_digital: {
+      id: 'R5',
+      tipo: 'opcao',
+      texto: 'Quem responde o Instagram/WhatsApp da clínica na maior parte do tempo?',
+      opcoes: {
+        dona: 'Eu, a dona/profissional',
+        secretaria: 'Secretária / recepção',
+        consultora: '"Vendedora" / consultora',
+        varias_sem_dono: 'Várias pessoas, sem dono',
+        automatico: 'Ferramenta / resposta automática',
+      },
+    },
+    orcamento: {
+      id: 'R6',
+      tipo: 'opcao',
+      texto: 'Quanto a clínica consegue investir por mês para resolver isso de verdade?',
+      opcoes: {
+        ate_1k: 'Até R$ 1.000',
+        de_1k_a_3k: 'R$ 1.000 a R$ 3.000',
+        de_3k_a_8k: 'R$ 3.000 a R$ 8.000',
+        acima_8k: 'Acima de R$ 8.000',
+        quer_entender_antes: 'Quero entender o que faz sentido antes de falar em valor',
+      },
+    },
+  },
+
+  // Escala 1–4. `invertida: true` = concordar é ruim (4 vira 0).
+  likert: {
+    // Precificação
+    P1: { bloco: 'preco', texto: 'Eu sei o custo real de cada protocolo (produto + tempo da profissional + taxa + ocupação da sala), não só o preço de tabela.' },
+    P2: { bloco: 'preco', texto: 'O preço foi definido por margem e posicionamento — não por "olhei a concorrente e cobrei R$ 50 a menos".' },
+    P3: { bloco: 'preco', texto: 'Na última semana, a clínica vendeu no valor cheio na maior parte dos fechamentos. Desconto foi exceção, com regra.' },
+    P4: { bloco: 'preco', texto: 'A gente vende protocolo / plano, não sessão isolada como produto principal.' },
+    P5: { bloco: 'preco', texto: 'Eu sei qual foi o menor preço que aceitamos nos últimos 30 dias — e quem autorizou.' },
+    P6: { bloco: 'preco', texto: 'Avaliação não é "consulta grátis para ouvir preço". Tem processo, e o valor só entra depois do plano.' },
+    P7: { bloco: 'preco', texto: 'No Instagram, a clínica não educa o público a perguntar só "quanto custa?". O conteúdo abre conversa de problema e resultado.' },
+    P8: { bloco: 'preco', texto: 'Pacote parcelado não é tratado como faturamento do mês. Eu separo caixa recebido de sessão a realizar.' },
+
+    // Comercial
+    C1: { bloco: 'comercial', texto: 'Existe um roteiro de atendimento do primeiro "oi" até o fechamento. Não depende do humor de quem pegou o celular.' },
+    C2: { bloco: 'comercial', texto: 'Eu sei, em número, quantas conversas viram avaliação e quantas avaliações viram protocolo pago nos últimos 30 dias.' },
+    C3: { bloco: 'comercial', texto: 'Quem diz "vou pensar / vou conversar em casa" entra numa sequência de follow-up com data. Não fica no limbo.' },
+    C4: { bloco: 'comercial', texto: 'A avaliação descobre orçamento, urgência e decisão antes de abrir um menu de 12 procedimentos.' },
+    C5: { bloco: 'comercial', texto: 'A profissional que executa e a pessoa que vende não se atrapalham: está claro quem conduz a parte comercial.' },
+    C6: { bloco: 'comercial', texto: 'No-show de avaliação é medido e tem recuperação (lembrete + reposição).' },
+    C7: { bloco: 'comercial', texto: 'O anúncio/post promete a mesma coisa que a recepção fala e que a avaliação entrega. Não tem uma clínica no Instagram e outra no balcão.' },
+
+    // Captação
+    CAP1: { bloco: 'captacao', invertida: true, texto: 'Se parar de postar 7 dias, a agenda sente.' },
+    CAP2: { bloco: 'captacao', texto: 'Sei o canal de cada paciente da semana (Instagram, Google, indicação, anúncio).' },
+    CAP3: { bloco: 'captacao', texto: 'Anúncio/post tem oferta e próximo passo (avaliação), não só resultado bonito.' },
+    CAP4: { bloco: 'captacao', texto: 'Indicação tem pedido + registro; não é "as pacientes indicam naturalmente".' },
+    CAP5: { bloco: 'captacao', texto: 'Lead fora do horário não morre até as 9h do dia seguinte.' },
+
+    // Operação do WhatsApp
+    WA1: { bloco: 'whatsapp', texto: 'Existe horário de cobertura real do WhatsApp (não "quando der").' },
+    WA2: { bloco: 'whatsapp', texto: 'Histórico do lead não se perde quando troca o celular.' },
+    WA3: { bloco: 'whatsapp', texto: 'Follow-up não depende de alguém lembrar.' },
+  },
+
+  categoricas: {
+    S1: {
+      bloco: 'papel',
+      texto: 'A pessoa que responde o digital hoje foi contratada para quê?',
+      opcoes: {
+        recepcao: 'Receber paciente na porta / agenda / telefone',
+        informar_valores: 'Responder mensagem e "informar valores"',
+        marcar_avaliacao: 'Qualificar e marcar avaliação',
+        vender_protocolo: 'Vender protocolo (tem meta e comissão)',
+        sou_eu: 'Sou eu fazendo tudo',
+      },
+    },
+    S2: {
+      bloco: 'papel',
+      texto: 'Essa pessoa pode conduzir uma conversa de protocolo de ticket alto sem te chamar?',
+      opcoes: {
+        sim: 'Sim, fecha sozinha',
+        so_marca: 'Só marca avaliação',
+        so_tabela: 'Só manda tabela / lista de preços',
+        nao_me_chama: 'Não; qualquer dúvida volta para mim',
+      },
+    },
+    S3: {
+      bloco: 'papel',
+      texto: 'Como essa pessoa é remunerada?',
+      opcoes: {
+        fixo_sem_comissao: 'Salário fixo baixo, sem comissão de venda',
+        fixo_avaliacao: 'Fixo + comissão por avaliação marcada',
+        fixo_protocolo: 'Fixo + comissão por protocolo fechado',
+        so_comissao: 'Só comissão',
+        sou_eu: 'Não se aplica (sou eu)',
+      },
+    },
+    S4: {
+      bloco: 'papel',
+      texto: 'Qual é a faixa de remuneração dessa função hoje?',
+      opcoes: {
+        ate_800: 'Até R$ 800',
+        '800_1500': 'R$ 800 a R$ 1.500',
+        '1500_3000_var': 'R$ 1.500 a R$ 3.000 + variável',
+        acima: 'Acima disso + variável',
+        sou_eu: 'Sou eu; não tem cadeira comercial',
+      },
+    },
+    S5: {
+      bloco: 'papel',
+      texto: 'Se entra um lead perguntando preço de um protocolo mais caro às 21h, o que acontece?',
+      opcoes: {
+        ninguem_responde: 'Ninguém responde até o dia seguinte',
+        auto_generica: 'Resposta automática genérica',
+        manda_valor: 'Alguém manda valor e para',
+        fluxo_marca: 'Há um fluxo que segura a conversa e marca avaliação',
+        depende: 'Depende do dia',
+      },
+    },
+    S6: {
+      bloco: 'papel',
+      texto: 'No digital, a clínica trata o lead como:',
+      opcoes: {
+        quer_informacao: 'Pessoa que "quer informação"',
+        precisa_qualificar: 'Pessoa que precisa ser qualificada',
+        vendida_com_processo: 'Pessoa que precisa ser vendida com ética e processo',
+        nao_pensamos: 'Ainda não pensamos assim',
+      },
+    },
+    WA4: {
+      bloco: 'whatsapp',
+      texto: 'A clínica já tentou robô no WhatsApp e ele só mandava preço, sem qualificar?',
+      opcoes: {
+        sim: 'Sim',
+        nao: 'Não / nunca tentamos',
+      },
+    },
+  },
+
+  livres: {
+    procedimento_mais_vende: { tipo: 'texto', opcional: true, texto: 'Qual procedimento vocês mais vendem?' },
+    procedimento_quer_vender: { tipo: 'texto', opcional: true, texto: 'E qual vocês mais queriam vender?' },
+    notas_livres: { tipo: 'texto', opcional: true, texto: 'Algo mais que a gente precise saber?' },
+  },
+}
+
+// Versão "8 minutos" (~26 toques). Se o quiz precisar caber no intervalo da dona,
+// mantém estes e deixa o resto em branco — o motor redistribui os pesos.
+const VERSAO_8_MINUTOS = {
+  roteamento: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'],
+  likert: ['P2', 'P3', 'P4', 'P6', 'P7', 'C1', 'C2', 'C3', 'C7', 'CAP1', 'CAP2', 'CAP3', 'WA1', 'WA3'],
+  categoricas: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'],
+}
+
+function answersVazio() {
+  return {
+    lead: { nome: '', papel: null, foco: null, porte: null, objetivo: null },
+    roteamento: { agenda: null, problemas: [], quem_responde_digital: null, orcamento: null },
+    likert: Object.fromEntries(Object.keys(QUESTOES.likert).map((k) => [k, null])),
+    categoricas: Object.fromEntries(Object.keys(QUESTOES.categoricas).map((k) => [k, null])),
+    livres: { procedimento_mais_vende: '', procedimento_quer_vender: '', notas_livres: '' },
+  }
+}
+
+
+// ---- lib/score.js
+// Motor do Raio-X da Clínica.
+// Respostas do quiz → scores (radar 0–100), subscores, flags, selos, oferta roteada,
+// persona sugerida e payload cru pro prompt do laudo.
+//
+// O LLM NÃO calcula score e NÃO inventa flag. Ele só escreve o laudo em cima de `payload`.
+
+
+// ---------------------------------------------------------------------------
+// Pesos
+// ---------------------------------------------------------------------------
+
+const PESOS = {
+  preco: { P1: 0.10, P2: 0.20, P3: 0.20, P4: 0.10, P5: 0.05, P6: 0.15, P7: 0.10, P8: 0.10 },
+  comercial: { C1: 0.15, C2: 0.20, C3: 0.15, C4: 0.15, C5: 0.10, C6: 0.10, C7: 0.15 },
+  captacao: { CAP1: 0.20, CAP2: 0.20, CAP3: 0.25, CAP4: 0.15, CAP5: 0.20 },
+  whatsapp: { WA1: 0.25, WA2: 0.15, WA3: 0.30, S5: 0.30 },
+  marca_demanda: { P7: 0.35, C7: 0.35, CAP3: 0.30 },
+  conversao: { preco: 0.45, comercial: 0.55 },
+  equipe_sistema: { whatsapp: 0.45, papel: 0.55 },
+}
+
+// Papel comercial: começa em 50 e anda com S1–S6 + quem responde o digital.
+const PAPEL_BASE = 50
+const PAPEL_DELTAS = {
+  S1: { recepcao: -20, informar_valores: -20, marcar_avaliacao: 0, vender_protocolo: 20, sou_eu: -5 },
+  S2: { sim: 25, so_marca: 0, so_tabela: -20, nao_me_chama: -20 },
+  S3: { fixo_sem_comissao: -15, fixo_avaliacao: 0, fixo_protocolo: 15, so_comissao: 5, sou_eu: -5 },
+  S4: { ate_800: -15, '800_1500': -10, '1500_3000_var': 10, acima: 15, sou_eu: -5 },
+  S5: { ninguem_responde: -10, auto_generica: -5, manda_valor: -10, fluxo_marca: 10, depende: -5 },
+  S6: { quer_informacao: -10, precisa_qualificar: 5, vendida_com_processo: 15, nao_pensamos: -10 },
+  R5: { dona: -5, secretaria: -10, consultora: 5, varias_sem_dono: -15, automatico: -5 },
+}
+
+// S5 entra no eixo WhatsApp como pontuação 0–100.
+const S5_PONTOS = { ninguem_responde: 0, auto_generica: 33, manda_valor: 33, depende: 33, fluxo_marca: 100 }
+
+const LIMIAR_GAP = 55
+const LIMIAR_OK = 65
+
+const OFERTAS = ['CONSULTORIA', 'COMERCIAL', 'IA_AUTOMACAO', 'TRAFEGO', 'PACOTE_COMPLETO', 'DIAGNOSTICO_PONTUAL']
+
+const PERSONAS = {
+  rainha_do_conteudo_agenda_oca: 'Rainha do conteúdo, agenda oca',
+  clinica_quanto_custa: 'Clínica de “quanto custa?”',
+  avaliacao_que_nao_fecha: 'Avaliação que não fecha',
+  secretaria_no_front: 'Secretária no front',
+  dona_no_plantao_21h: 'Dona no plantão 21h',
+  desconto_como_idioma: 'Desconto como idioma',
+  indicacao_cansada: 'Indicação cansada',
+  fecha_barato_sonha_caro: 'Fecha o barato, sonha o caro',
+  ferramenta_sem_metodo: 'Ferramenta sem método',
+  pronta_para_o_sistema: 'Pronta para o sistema',
+  atendimento_no_lugar_de_venda: 'Atendimento no lugar de venda',
+  agenda_cheia_caixa_magro: 'Agenda cheia, caixa magro',
+}
+
+// Com qualquer uma destas, TRAFEGO nunca é passo 1.
+const FLAGS_PROIBEM_TRAFEGO = [
+  'funcao_comercial_inexistente',
+  'vendedora_fantasia',
+  'avaliacao_balcao_de_tabela',
+  'desconto_habito',
+]
+
+const ORCAMENTO_ALTO = ['de_3k_a_8k', 'acima_8k']
+const ORCAMENTO_BAIXO = ['ate_1k', 'de_1k_a_3k']
+
+// ---------------------------------------------------------------------------
+// Normalização
+// ---------------------------------------------------------------------------
+
+function vazio(v) {
+  return v === undefined || v === null || v === ''
+}
+
+// Valida cada resposta contra o contrato. Resposta inválida vira null e entra em `invalidas`.
+function normalizar(answers = {}) {
+  const missing = []
+  const invalidas = []
+  const a = {
+    lead: { ...(answers.lead || {}) },
+    roteamento: { ...(answers.roteamento || {}) },
+    likert: { ...(answers.likert || {}) },
+    categoricas: { ...(answers.categoricas || {}) },
+    livres: { ...(answers.livres || {}) },
+  }
+
+  for (const grupo of ['lead', 'roteamento']) {
+    for (const [id, q] of Object.entries(QUESTOES[grupo])) {
+      const v = a[grupo][id]
+      if (q.tipo === 'texto') {
+        a[grupo][id] = vazio(v) ? '' : String(v)
+        continue
+      }
+      if (q.tipo === 'multi') {
+        const arr = Array.isArray(v) ? v : vazio(v) ? [] : [v]
+        const ok = arr.filter((x) => x in q.opcoes)
+        if (ok.length !== arr.length) invalidas.push(`${grupo}.${id}`)
+        if (ok.length === 0 && !q.opcional) missing.push(`${grupo}.${id}`)
+        a[grupo][id] = ok.slice(0, q.max || ok.length)
+        continue
+      }
+      if (vazio(v)) {
+        a[grupo][id] = null
+        if (!q.opcional) missing.push(`${grupo}.${id}`)
+      } else if (!(v in q.opcoes)) {
+        a[grupo][id] = null
+        invalidas.push(`${grupo}.${id}`)
+      }
+    }
+  }
+
+  for (const id of Object.keys(QUESTOES.likert)) {
+    const v = a.likert[id]
+    if (vazio(v)) {
+      a.likert[id] = null
+      missing.push(`likert.${id}`)
+      continue
+    }
+    const n = Number(v)
+    if (![1, 2, 3, 4].includes(n)) {
+      a.likert[id] = null
+      invalidas.push(`likert.${id}`)
+    } else {
+      a.likert[id] = n
+    }
+  }
+
+  for (const [id, q] of Object.entries(QUESTOES.categoricas)) {
+    const v = a.categoricas[id]
+    if (vazio(v)) {
+      a.categoricas[id] = null
+      missing.push(`categoricas.${id}`)
+    } else if (!(v in q.opcoes)) {
+      a.categoricas[id] = null
+      invalidas.push(`categoricas.${id}`)
+    }
+  }
+
+  for (const id of Object.keys(QUESTOES.livres)) {
+    a.livres[id] = vazio(a.livres[id]) ? '' : String(a.livres[id]).trim()
+  }
+
+  return { answers: a, missing, invalidas }
+}
+
+// ---------------------------------------------------------------------------
+// Scores
+// ---------------------------------------------------------------------------
+
+function likertPontos(id, valor) {
+  if (valor === null || valor === undefined) return null
+  const pts = LIKERT_PONTOS[valor]
+  return QUESTOES.likert[id]?.invertida ? 100 - pts : pts
+}
+
+// Média ponderada ignorando itens em branco (peso redistribuído). null se nada respondido.
+function mediaPonderada(itens) {
+  let soma = 0
+  let pesos = 0
+  for (const { valor, peso } of itens) {
+    if (valor === null || valor === undefined) continue
+    soma += valor * peso
+    pesos += peso
+  }
+  return pesos === 0 ? null : soma / pesos
+}
+
+function arredondar(x) {
+  return x === null ? null : Math.round(x)
+}
+
+function clamp(x, lo = 0, hi = 100) {
+  return Math.max(lo, Math.min(hi, x))
+}
+
+function scoreLikert(pesos, likert) {
+  return mediaPonderada(Object.entries(pesos).map(([id, peso]) => ({ valor: likertPontos(id, likert[id]), peso })))
+}
+
+function scorePapelComercial(a) {
+  const fontes = { ...a.categoricas, R5: a.roteamento.quem_responde_digital }
+  let respondeu = false
+  let score = PAPEL_BASE
+  for (const [id, deltas] of Object.entries(PAPEL_DELTAS)) {
+    const v = fontes[id]
+    if (v === null || v === undefined) continue
+    if (v in deltas) {
+      score += deltas[v]
+      respondeu = true
+    }
+  }
+  return respondeu ? clamp(score) : null
+}
+
+function calcularScores(a) {
+  const { likert, categoricas } = a
+
+  const preco = scoreLikert(PESOS.preco, likert)
+  const comercial = scoreLikert(PESOS.comercial, likert)
+  const captacao = scoreLikert(PESOS.captacao, likert)
+  const marca_demanda = scoreLikert(PESOS.marca_demanda, likert)
+
+  const whatsapp = mediaPonderada([
+    { valor: likertPontos('WA1', likert.WA1), peso: PESOS.whatsapp.WA1 },
+    { valor: likertPontos('WA2', likert.WA2), peso: PESOS.whatsapp.WA2 },
+    { valor: likertPontos('WA3', likert.WA3), peso: PESOS.whatsapp.WA3 },
+    { valor: categoricas.S5 ? S5_PONTOS[categoricas.S5] : null, peso: PESOS.whatsapp.S5 },
+  ])
+
+  const papel = scorePapelComercial(a)
+
+  const conversao = mediaPonderada([
+    { valor: preco, peso: PESOS.conversao.preco },
+    { valor: comercial, peso: PESOS.conversao.comercial },
+  ])
+  const equipe_sistema = mediaPonderada([
+    { valor: whatsapp, peso: PESOS.equipe_sistema.whatsapp },
+    { valor: papel, peso: PESOS.equipe_sistema.papel },
+  ])
+
+  return {
+    scores: {
+      marca_demanda: arredondar(marca_demanda),
+      captacao: arredondar(captacao),
+      conversao: arredondar(conversao),
+      equipe_sistema: arredondar(equipe_sistema),
+    },
+    subscores: {
+      preco: arredondar(preco),
+      comercial: arredondar(comercial),
+      papel_comercial: arredondar(papel),
+      whatsapp_operacao: arredondar(whatsapp),
+    },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Flags
+// ---------------------------------------------------------------------------
+
+const baixo = (v) => v !== null && v !== undefined && v <= 2
+const alto = (v) => v !== null && v !== undefined && v >= 3
+const em = (v, lista) => lista.includes(v)
+
+function detectarFlags(a, scores, subscores) {
+  const f = new Set()
+  const { likert: L, categoricas: S, roteamento: R } = a
+
+  // --- Preço
+  if (baixo(L.P3)) f.add('desconto_habito')
+  if (baixo(L.P2)) f.add('preco_por_concorrente')
+  if (baixo(L.P1)) f.add('nao_sabe_custo_do_protocolo')
+  if (baixo(L.P4)) f.add('vende_sessao_nao_protocolo')
+  if (baixo(L.P6)) f.add('avaliacao_balcao_de_tabela')
+  if (baixo(L.P7)) f.add('preco_no_instagram_sem_qualificar')
+  if (baixo(L.P8)) f.add('caixa_confundido_com_receita')
+
+  // --- Comercial / papel
+  const funcaoInexistente =
+    em(S.S1, ['recepcao', 'informar_valores']) &&
+    em(S.S2, ['so_tabela', 'nao_me_chama']) &&
+    S.S3 === 'fixo_sem_comissao' &&
+    em(S.S4, ['ate_800', '800_1500'])
+  if (funcaoInexistente) f.add('funcao_comercial_inexistente')
+
+  const vendedoraFantasia =
+    R.quem_responde_digital === 'secretaria' &&
+    S.S4 === 'ate_800' &&
+    L.C2 === 1 &&
+    em(R.agenda, ['folgada', 'cheia_avaliacao_pouco_fecha'])
+  if (vendedoraFantasia) f.add('vendedora_fantasia')
+
+  if (R.quem_responde_digital === 'secretaria' && (S.S1 === 'informar_valores' || S.S2 === 'so_tabela')) {
+    f.add('secretaria_informa_preco')
+  }
+  if (S.S2 !== null && S.S2 !== 'sim') f.add('closer_inexistente')
+  if (S.S1 === 'sou_eu' || S.S3 === 'sou_eu' || S.S4 === 'sou_eu' || R.quem_responde_digital === 'dona') {
+    f.add('dona_e_o_comercial')
+  }
+  if (S.S3 === 'fixo_sem_comissao') f.add('remuneracao_sem_comissao')
+  if (em(S.S4, ['ate_800', '800_1500'])) f.add('salario_comercial_abaixo_1500')
+  if (R.quem_responde_digital === 'varias_sem_dono') f.add('papel_digital_sem_dono')
+
+  // --- Operação WhatsApp
+  if (em(S.S5, ['ninguem_responde', 'manda_valor']) || baixo(L.CAP5)) f.add('lead_21h_morto')
+  if (baixo(L.C3) || baixo(L.WA3)) f.add('followup_inexistente')
+  if (R.quem_responde_digital === 'varias_sem_dono' || baixo(L.WA1)) f.add('whatsapp_sem_dono')
+  if (S.WA4 === 'sim' || (R.quem_responde_digital === 'automatico' && em(S.S5, ['manda_valor', 'auto_generica']))) {
+    f.add('bot_que_so_manda_tabela')
+  }
+  if (baixo(L.WA2)) f.add('historico_se_perde_no_celular')
+
+  // --- Captação
+  if (scores.captacao !== null && scores.captacao < LIMIAR_GAP) f.add('gap_captacao')
+  if (alto(L.CAP1)) f.add('depende_de_postar')
+  if (baixo(L.CAP2)) f.add('nao_sabe_origem_do_paciente')
+  if (baixo(L.CAP4)) f.add('indicacao_nao_sistematizada')
+  if (baixo(L.CAP3)) f.add('conteudo_sem_proximo_passo')
+
+  // --- Conversão
+  if ((scores.conversao !== null && scores.conversao < LIMIAR_GAP) || funcaoInexistente) f.add('gap_comercial')
+  if (baixo(L.C2)) f.add('nao_mede_taxa_de_fechamento')
+  if (baixo(L.C1) || baixo(L.C4)) f.add('avaliacao_sem_roteiro')
+  if (baixo(L.C5)) f.add('profissional_e_venda_misturados')
+  if (baixo(L.C6)) f.add('no_show_ignorado')
+  if (baixo(L.C7)) f.add('mensagem_anuncio_diferente_da_recepcao')
+
+  // --- Contexto
+  const agendaFlag = {
+    folgada: 'agenda_folgada',
+    oscila: 'agenda_oscila',
+    cheia_avaliacao_pouco_fecha: 'cheia_de_avaliacao_pouco_fechamento',
+    cheia_caixa_nao_reflete: 'cheia_caixa_nao_reflete',
+    cheia_no_limite: 'dona_no_limite',
+  }[R.agenda]
+  if (agendaFlag) f.add(agendaFlag)
+
+  const orcFlag = {
+    ate_1k: 'orcamento_ate_1k',
+    de_1k_a_3k: 'orcamento_1k_3k',
+    de_3k_a_8k: 'orcamento_3k_8k',
+    acima_8k: 'orcamento_acima_8k',
+    quer_entender_antes: 'quer_entender_antes',
+  }[R.orcamento]
+  if (orcFlag) f.add(orcFlag)
+
+  return [...f]
+}
+
+// ---------------------------------------------------------------------------
+// Gaps derivados (usados pelo roteador)
+// ---------------------------------------------------------------------------
+
+function derivarGaps(a, scores, subscores, flags) {
+  const has = (x) => flags.includes(x)
+  const problemas = a.roteamento.problemas || []
+
+  const gap_preco = has('preco_por_concorrente') || has('desconto_habito') || has('avaliacao_balcao_de_tabela')
+  const fechaBarato = a.roteamento.agenda === 'cheia_caixa_nao_reflete' || problemas.includes('fecha_barato')
+  const precoFlags = ['desconto_habito', 'preco_por_concorrente', 'avaliacao_balcao_de_tabela'].filter(has).length
+  const gap_preco_grave = precoFlags >= 2 || (has('desconto_habito') && fechaBarato)
+  const naoChegaNinguem = a.roteamento.agenda === 'folgada' || problemas.includes('pouca_gente')
+
+  return {
+    gap_captacao: has('gap_captacao'),
+    gap_comercial: has('gap_comercial'),
+    gap_preco,
+    gap_preco_grave,
+    gap_whatsapp: has('lead_21h_morto') || has('followup_inexistente') || has('whatsapp_sem_dono'),
+    fecha_barato: fechaBarato,
+    nao_chega_ninguem: naoChegaNinguem,
+    eixos_abaixo_55: Object.values(scores).filter((s) => s !== null && s < LIMIAR_GAP).length,
+    papel_ok: subscores.papel_comercial !== null && subscores.papel_comercial >= LIMIAR_OK && !has('funcao_comercial_inexistente'),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Selos
+// ---------------------------------------------------------------------------
+
+function calcularSelos(a, subscores, flags) {
+  const has = (x) => flags.includes(x)
+  const S = a.categoricas
+  const R5 = a.roteamento.quem_responde_digital
+
+  let selo_preco
+  if (has('desconto_habito')) selo_preco = 'desconto_como_habito'
+  else if (has('preco_por_concorrente') || has('avaliacao_balcao_de_tabela') || (subscores.preco !== null && subscores.preco < LIMIAR_OK)) {
+    selo_preco = 'tabela_fragil'
+  } else selo_preco = 'preco_no_controle'
+
+  let selo_papel
+  if (has('funcao_comercial_inexistente') || has('vendedora_fantasia')) selo_papel = 'funcao_ausente'
+  else if (S.S2 === 'sim' && em(S.S1, ['vender_protocolo', 'marcar_avaliacao'])) selo_papel = 'closer_existente'
+  else if (S.S1 === 'sou_eu' || R5 === 'dona') selo_papel = 'dona_vende'
+  else if (em(R5, ['secretaria', 'consultora']) || em(S.S1, ['recepcao', 'informar_valores'])) selo_papel = 'secretaria_no_comercial'
+  else if (has('closer_inexistente')) selo_papel = 'funcao_ausente'
+  else selo_papel = 'closer_existente'
+
+  return { selo_preco, selo_papel }
+}
+
+// ---------------------------------------------------------------------------
+// Roteamento
+// ---------------------------------------------------------------------------
+
+const COPY = {
+  PACOTE_COMPLETO: 'Vocês estão pagando para um funil que a recepção não consegue virar venda.',
+  COMERCIAL: 'Não falta paciente. Falta conversa que fecha.',
+  IA_AUTOMACAO: "O ralo é o intervalo entre o 'oi' e a avaliação.",
+  TRAFEGO: 'O comercial aguenta volume. Agora falta volume certo.',
+  CONSULTORIA: 'Anúncio em cima de preço frágil só treina o mercado a pechinchar.',
+  DIAGNOSTICO_PONTUAL: 'Antes de comprar sistema, vale fechar o ralo que já dá pra ver — e medir três números.',
+}
+
+const NAO_FAZER = {
+  PACOTE_COMPLETO: 'Não aumentar anúncio isolado. Não contratar mais uma secretária para "informar valores".',
+  COMERCIAL: 'Não colocar anúncio em cima do processo atual. Não delegar o fechamento para quem só manda tabela.',
+  IA_AUTOMACAO: 'Não instalar bot de tabela. Não subir verba de anúncio antes do fluxo segurar o lead.',
+  TRAFEGO: 'Não anunciar "resultado bonito" sem oferta e próximo passo. Não mudar o roteiro que já fecha.',
+  CONSULTORIA: 'Não anunciar agora: multiplica "quanto custa?" em cima de preço frágil. Não criar promoção para "girar".',
+  DIAGNOSTICO_PONTUAL: 'Não contratar pacote nem tráfego. Não trocar de ferramenta antes de medir.',
+}
+
+const FASE_2 = {
+  PACOTE_COMPLETO: 'Com roteiro rodando e IA cobrindo o fora de hora, escalar verba com oferta de conversão.',
+  COMERCIAL: 'Depois que a taxa de fechamento estiver medida e estável, tráfego de conversão para dar volume.',
+  IA_AUTOMACAO: 'Tráfego de conversão só quando o fluxo estiver qualificando e marcando sem despachar tabela.',
+  TRAFEGO: 'Com volume entrando, IA no fora de hora e follow-up automático para não perder o que o anúncio traz.',
+  CONSULTORIA: 'Com tabela, protocolo e regra de desconto prontos, processo comercial e depois tráfego.',
+  DIAGNOSTICO_PONTUAL: 'Com os três números na mão, decidir entre IA avulsa, comercial ou pacote.',
+}
+
+function rotear(a, scores, subscores, flags, gaps) {
+  const has = (x) => flags.includes(x)
+  const orc = a.roteamento.orcamento
+  const trafego_proibido_passo_1 = FLAGS_PROIBEM_TRAFEGO.some(has)
+  const funcaoQuebrada = has('funcao_comercial_inexistente') || has('vendedora_fantasia')
+  const whatsappRalo = has('lead_21h_morto') || has('followup_inexistente') || has('whatsapp_sem_dono')
+
+  let principal = null
+  let complementar = null
+  let regra = null
+
+  // Regra 1 — sem função comercial + sem captação + fôlego pra investir
+  if (funcaoQuebrada && gaps.gap_captacao && em(orc, ORCAMENTO_ALTO)) {
+    principal = 'PACOTE_COMPLETO'
+    regra = 1
+  }
+  // Regra 2 — preço frágil + fecha barato + não é caso de "não chega ninguém"
+  else if (
+    (has('desconto_habito') || has('preco_por_concorrente') || has('avaliacao_balcao_de_tabela')) &&
+    gaps.fecha_barato &&
+    !gaps.nao_chega_ninguem
+  ) {
+    principal = 'CONSULTORIA'
+    complementar = gaps.gap_comercial ? 'COMERCIAL' : null
+    regra = 2
+  }
+  // Regra 3 — comercial quebrado, captação ok
+  else if (gaps.gap_comercial && !gaps.gap_captacao) {
+    principal = 'COMERCIAL'
+    complementar = has('lead_21h_morto') || has('followup_inexistente') ? 'IA_AUTOMACAO' : null
+    regra = 3
+  }
+  // Regra 4 — ralo no WhatsApp + orçamento baixo
+  else if (
+    whatsappRalo &&
+    em(orc, ORCAMENTO_BAIXO) &&
+    !(gaps.gap_preco_grave && has('funcao_comercial_inexistente'))
+  ) {
+    principal = 'IA_AUTOMACAO'
+    regra = 4
+  }
+  // Regra 5 — falta volume, comercial aguenta (tráfego não cabe em até R$ 1k/mês)
+  else if (
+    gaps.gap_captacao &&
+    scores.conversao !== null &&
+    scores.conversao >= LIMIAR_OK &&
+    !trafego_proibido_passo_1 &&
+    orc !== 'ate_1k'
+  ) {
+    principal = 'TRAFEGO'
+    complementar = has('lead_21h_morto') ? 'IA_AUTOMACAO' : null
+    regra = 5
+  }
+  // Regra 6 — orçamento até 1k e o caso não cabe em IA
+  else if (orc === 'ate_1k') {
+    principal = 'DIAGNOSTICO_PONTUAL'
+    regra = 6
+  }
+  // Regra 7 — 2+ eixos abaixo de 55 com fôlego
+  else if (gaps.eixos_abaixo_55 >= 2 && em(orc, ORCAMENTO_ALTO)) {
+    principal = 'PACOTE_COMPLETO'
+    regra = 7
+  }
+  // Fallback — nenhuma regra bateu. Nunca tráfego quando papel/preço estão quebrados.
+  else if (gaps.gap_comercial) {
+    principal = 'COMERCIAL'
+    complementar = whatsappRalo ? 'IA_AUTOMACAO' : null
+    regra = 'fallback_comercial'
+  } else if (gaps.gap_captacao) {
+    principal = trafego_proibido_passo_1 ? 'COMERCIAL' : 'TRAFEGO'
+    complementar = has('lead_21h_morto') ? 'IA_AUTOMACAO' : null
+    regra = 'fallback_captacao'
+  } else if (whatsappRalo) {
+    principal = 'IA_AUTOMACAO'
+    regra = 'fallback_whatsapp'
+  } else if (gaps.gap_preco) {
+    principal = 'CONSULTORIA'
+    regra = 'fallback_preco'
+  } else if (orc === 'quer_entender_antes' || orc === null) {
+    principal = 'DIAGNOSTICO_PONTUAL'
+    regra = 'fallback_sem_gap_sem_orcamento'
+  } else {
+    principal = trafego_proibido_passo_1 ? 'COMERCIAL' : 'TRAFEGO'
+    regra = 'fallback_sem_gap'
+  }
+
+  // Trava dura: o código decide, o modelo não reabre.
+  if (principal === 'TRAFEGO' && trafego_proibido_passo_1) {
+    principal = 'COMERCIAL'
+    regra = `${regra}+trava_trafego`
+  }
+
+  return {
+    principal,
+    complementar,
+    regra,
+    trafego_proibido_passo_1,
+    copy_gancho: COPY[principal],
+    o_que_nao_fazer_agora: NAO_FAZER[principal],
+    fase_2: FASE_2[principal],
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Persona
+// ---------------------------------------------------------------------------
+
+function sugerirPersona(a, scores, flags, gaps, oferta) {
+  const has = (x) => flags.includes(x)
+  const R = a.roteamento
+  const L = a.livres
+  const problemas = R.problemas || []
+  const semGap = Object.values(scores).every((s) => s === null || s >= LIMIAR_GAP)
+
+  if (has('funcao_comercial_inexistente') || has('vendedora_fantasia')) return 'atendimento_no_lugar_de_venda'
+  if (has('bot_que_so_manda_tabela')) return 'ferramenta_sem_metodo'
+  if (has('desconto_habito') && gaps.fecha_barato) return 'desconto_como_idioma'
+  if (R.agenda === 'cheia_caixa_nao_reflete') return 'agenda_cheia_caixa_magro'
+  if (
+    L.procedimento_mais_vende &&
+    L.procedimento_quer_vender &&
+    L.procedimento_mais_vende.toLowerCase() !== L.procedimento_quer_vender.toLowerCase() &&
+    (problemas.includes('fecha_barato') || has('desconto_habito') || has('vende_sessao_nao_protocolo'))
+  ) {
+    return 'fecha_barato_sonha_caro'
+  }
+  if (R.quem_responde_digital === 'secretaria' && has('closer_inexistente')) return 'secretaria_no_front'
+  if (R.quem_responde_digital === 'dona' && (has('lead_21h_morto') || has('dona_no_limite'))) return 'dona_no_plantao_21h'
+  if (has('preco_no_instagram_sem_qualificar') && (problemas.includes('nao_fecha') || R.agenda === 'folgada')) return 'clinica_quanto_custa'
+  if (R.agenda === 'cheia_avaliacao_pouco_fecha' || (!gaps.gap_captacao && gaps.gap_comercial)) return 'avaliacao_que_nao_fecha'
+  if (gaps.gap_captacao && has('depende_de_postar')) return 'rainha_do_conteudo_agenda_oca'
+  if (gaps.gap_captacao && has('indicacao_nao_sistematizada')) return 'indicacao_cansada'
+  if (gaps.gap_captacao) return 'rainha_do_conteudo_agenda_oca'
+  if (oferta.principal === 'PACOTE_COMPLETO' || semGap) return 'pronta_para_o_sistema'
+  return 'avaliacao_que_nao_fecha'
+}
+
+// ---------------------------------------------------------------------------
+// API principal
+// ---------------------------------------------------------------------------
+
+function avaliar(answersBrutas) {
+  const { answers: a, missing, invalidas } = normalizar(answersBrutas)
+  const { scores, subscores } = calcularScores(a)
+  const flags = detectarFlags(a, scores, subscores)
+  const gaps = derivarGaps(a, scores, subscores, flags)
+  const selos = calcularSelos(a, subscores, flags)
+  const oferta = rotear(a, scores, subscores, flags, gaps)
+  const persona_sugerida = sugerirPersona(a, scores, flags, gaps, oferta)
+
+  const payload = {
+    lead: {
+      nome: a.lead.nome,
+      papel: a.lead.papel,
+      foco: a.lead.foco,
+      porte: a.lead.porte,
+      objetivo: a.lead.objetivo,
+    },
+    roteamento: {
+      agenda: a.roteamento.agenda,
+      problemas: a.roteamento.problemas,
+      quem_responde_digital: a.roteamento.quem_responde_digital,
+      orcamento: a.roteamento.orcamento,
+    },
+    scores,
+    subscores: {
+      preco: subscores.preco,
+      papel_comercial: subscores.papel_comercial,
+      whatsapp_operacao: subscores.whatsapp_operacao,
+    },
+    flags,
+    respostas_chave: {
+      quem_foi_contratada_para: a.categoricas.S1,
+      fecha_sozinha_ticket_alto: a.categoricas.S2,
+      remuneracao: a.categoricas.S3,
+      faixa_remuneracao: a.categoricas.S4,
+      lead_21h: a.categoricas.S5,
+      procedimento_mais_vende: a.livres.procedimento_mais_vende,
+      procedimento_quer_vender: a.livres.procedimento_quer_vender,
+    },
+    notas_livres: a.livres.notas_livres,
+    // Decisão do motor. O prompt do laudo usa isto e não recalcula.
+    motor: {
+      oferta_principal: oferta.principal,
+      oferta_complementar: oferta.complementar,
+      regra: oferta.regra,
+      trafego_proibido_passo_1: oferta.trafego_proibido_passo_1,
+      persona_sugerida,
+      persona_titulo: PERSONAS[persona_sugerida],
+      selo_preco: selos.selo_preco,
+      selo_papel: selos.selo_papel,
+    },
+  }
+
+  return {
+    payload,
+    scores,
+    subscores,
+    flags,
+    gaps,
+    selos,
+    oferta,
+    persona_sugerida,
+    persona_titulo: PERSONAS[persona_sugerida],
+    missing,
+    invalidas,
+  }
+}
+
+// Checagem de saída do LLM: o laudo não pode contrariar o motor.
+function validarLaudo(laudo, resultado) {
+  const erros = []
+  if (!laudo || typeof laudo !== 'object') return ['laudo não é objeto']
+  if (laudo.oferta?.principal !== resultado.oferta.principal) {
+    erros.push(`oferta.principal deveria ser ${resultado.oferta.principal}, veio ${laudo.oferta?.principal}`)
+  }
+  if (laudo.oferta?.principal === 'TRAFEGO' && resultado.oferta.trafego_proibido_passo_1) {
+    erros.push('TRAFEGO como passo 1 com flag que proíbe tráfego')
+  }
+  if (laudo.persona?.id && !(laudo.persona.id in PERSONAS)) {
+    erros.push(`persona desconhecida: ${laudo.persona.id}`)
+  }
+  if (laudo.persona?.id && laudo.persona.titulo !== PERSONAS[laudo.persona.id]) {
+    erros.push(`título da persona diferente do canônico: ${laudo.persona.titulo}`)
+  }
+  if (laudo.selo_preco && laudo.selo_preco !== resultado.selos.selo_preco) {
+    erros.push(`selo_preco deveria ser ${resultado.selos.selo_preco}`)
+  }
+  if (laudo.selo_papel && laudo.selo_papel !== resultado.selos.selo_papel) {
+    erros.push(`selo_papel deveria ser ${resultado.selos.selo_papel}`)
+  }
+  return erros
+}
+
+
+// ---- app/scripts/flow.js
+// Conteúdo do Raio-X da Clínica: ordem das perguntas no chat, mensagens do guia,
+// condecorações, personas, SWOT e notas por eixo.
+// O motor (lib/score.js) decide score, flags e oferta. Aqui só mora texto e sequência.
+
+
+
+// Ajuste aqui. WhatsApp em branco = o botão de contato não aparece.
+const CONFIG = {
+  guia: 'Gabriel',
+  guiaIniciais: 'G',
+  marca: 'Raio-X da Clínica',
+  whatsapp: '', // ex: '5511999999999'
+  duracao: '8 minutos',
+}
+
+const SECOES = {
+  perfil: 'Perfil',
+  agenda: 'Agenda e problema',
+  preco: 'Preço',
+  comercial: 'Comercial',
+  captacao: 'Captação',
+  whatsapp: 'WhatsApp',
+  papel: 'Quem vende',
+  extra: 'Bônus',
+}
+
+const LIKERT_OPCOES = [
+  { valor: 1, label: 'Não acontece / não sei' },
+  { valor: 2, label: 'Às vezes, no improviso' },
+  { valor: 3, label: 'Acontece, mas sem controle' },
+  { valor: 4, label: 'É regra da clínica' },
+]
+
+const ICON = {
+  marca: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5.2 5.6.7-4.1 3.9 1.1 5.6L12 15.7 7 18.4l1.1-5.6L4 8.9l5.6-.7z"/></svg>',
+  captacao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></svg>',
+  conversao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>',
+  equipe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 13.6c3 0 5.5 2.4 5.5 5.4"/></svg>',
+}
+
+const EIXOS = [
+  { id: 'marca_demanda', label: 'Marca', radar: 'MARCA', longo: 'Marca e demanda', icon: ICON.marca },
+  { id: 'captacao', label: 'Captação', radar: 'CAPTAÇÃO', longo: 'Captação', icon: ICON.captacao },
+  { id: 'conversao', label: 'Conversão', radar: 'CONVERSÃO', longo: 'Conversão comercial', icon: ICON.conversao },
+  { id: 'equipe_sistema', label: 'Equipe', radar: 'EQUIPE', longo: 'Equipe e sistema', icon: ICON.equipe },
+]
+
+// Faixas semafóricas alinhadas aos limiares do motor (55 = gap, 65 = ok).
+function faixa(score) {
+  if (score === null || score === undefined) return 'none'
+  if (score >= LIMIAR_OK) return 'top'
+  if (score >= LIMIAR_GAP) return 'good'
+  if (score >= 40) return 'mid'
+  return 'low'
+}
+
+const COR_FAIXA = { top: '#89CC72', good: '#5E9F4E', mid: '#D4A637', low: '#C44545', none: '#1A5440' }
+
+// ---------------------------------------------------------------------------
+// Perguntas na ordem do chat (versão 8 minutos + bônus)
+// ---------------------------------------------------------------------------
+
+function q(grupo, id, extra = {}) {
+  const def = QUESTOES[grupo][id]
+  const tipo = extra.tipo || (grupo === 'likert' ? 'likert' : def.tipo === 'multi' ? 'multi' : def.tipo === 'texto' ? 'texto' : 'opcao')
+  return {
+    grupo,
+    id,
+    tipo,
+    max: def.max,
+    opcional: !!def.opcional || !!extra.opcional,
+    prompt: extra.prompt || def.texto,
+    placeholder: extra.placeholder || '',
+    secao: extra.secao || 'perfil',
+    opcoes: def.opcoes || null,
+  }
+}
+
+const PERGUNTAS = [
+  q('lead', 'nome', { prompt: 'Pra começar: como você se chama?', placeholder: 'Ex: Camila', secao: 'perfil' }),
+  q('lead', 'papel', { secao: 'perfil' }),
+  q('lead', 'foco', { prompt: 'O que a clínica mais faz hoje?', secao: 'perfil' }),
+
+  q('roteamento', 'agenda', { secao: 'agenda' }),
+  q('roteamento', 'problemas', { prompt: 'Qual é o principal problema agora? Pode marcar até 2.', secao: 'agenda' }),
+  q('roteamento', 'quem_responde_digital', { secao: 'agenda' }),
+  q('roteamento', 'orcamento', { prompt: 'Quanto a clínica consegue investir por mês pra resolver isso de verdade? Não é pra constranger. É pra eu não te empurrar pacote se o caso pede só uma peça.', secao: 'agenda' }),
+
+  q('likert', 'P2', { secao: 'preco' }),
+  q('likert', 'P3', { secao: 'preco' }),
+  q('likert', 'P4', { secao: 'preco' }),
+  q('likert', 'P6', { secao: 'preco' }),
+  q('likert', 'P7', { secao: 'preco' }),
+
+  q('likert', 'C1', { secao: 'comercial' }),
+  q('likert', 'C2', { secao: 'comercial' }),
+  q('likert', 'C3', { secao: 'comercial' }),
+  q('likert', 'C7', { secao: 'comercial' }),
+
+  q('likert', 'CAP1', { secao: 'captacao' }),
+  q('likert', 'CAP2', { secao: 'captacao' }),
+  q('likert', 'CAP3', { secao: 'captacao' }),
+
+  q('likert', 'WA1', { secao: 'whatsapp' }),
+  q('likert', 'WA3', { secao: 'whatsapp' }),
+
+  q('categoricas', 'S1', { secao: 'papel' }),
+  q('categoricas', 'S2', { secao: 'papel' }),
+  q('categoricas', 'S3', { secao: 'papel' }),
+  q('categoricas', 'S4', { secao: 'papel' }),
+  q('categoricas', 'S5', { secao: 'papel' }),
+  q('categoricas', 'S6', { secao: 'papel' }),
+
+  q('livres', 'procedimento_mais_vende', { prompt: 'Bônus, vale ouro no laudo: qual procedimento vocês mais vendem hoje?', placeholder: 'Ex: limpeza de pele', secao: 'extra', opcional: true }),
+  q('livres', 'procedimento_quer_vender', { prompt: 'E qual vocês mais queriam vender?', placeholder: 'Ex: bioestimulador', secao: 'extra', opcional: true }),
+]
+
+const OBRIGATORIAS = PERGUNTAS.filter((p) => !p.opcional)
+
+// ---------------------------------------------------------------------------
+// Mensagens do guia
+// ---------------------------------------------------------------------------
+
+const MENSAGENS_INTRO = [
+  `Oi. Eu sou o ${CONFIG.guia}. Nos próximos ${CONFIG.duracao} a gente acha onde a sua clínica perde dinheiro entre o "oi" no WhatsApp e o protocolo pago.`,
+  'Não tem resposta certa. Tem o que acontece na sua clínica numa terça-feira às 21h.',
+]
+
+// Depois da resposta. String, ou função (valor, answers, resultado) → string | null.
+const MENSAGENS_DEPOIS = {
+  nome: 'Fechado, {nome}. Repara no laudo ao lado: cada resposta preenche um pedaço dele em tempo real.<span data-onboarding-result></span>',
+  foco: 'Agora quatro perguntas de contexto. Elas não pontuam. Elas decidem o filme.',
+  orcamento: 'Contexto pronto. Agora o bloco que costuma doer: preço. Escala de 1 a 4.',
+  P3: (v) => (v <= 2 ? 'Desconto virou idioma. Anúncio agora só traria mais gente treinada a pechinchar.' : null),
+  P6: (v) => (v <= 2 ? 'Avaliação como balcão de tabela: a pessoa entra pra ouvir preço e sai comparando com a vizinha.' : null),
+  P7: 'Preço fechado. Agora o comercial: do primeiro "oi" até o fechamento.',
+  C2: (v) => (v === 1 ? 'Sem esse número a clínica voa no escuro. Ninguém conserta o que não mede.' : v === 4 ? 'Você mede. Isso já te separa da maioria das clínicas que eu vejo.' : null),
+  C3: (v) => (v <= 2 ? '"Vou pensar" sem data marcada é lead morto com educação.' : null),
+  C7: 'Captação em três toques.',
+  CAP3: 'Dois toques sobre a operação do WhatsApp.',
+  WA3: 'Último bloco, o decisivo: quem responde o digital da clínica foi contratada pra quê?',
+  S4: (v) => (v === 'ate_800' ? 'Até R$ 800 paga atendimento. Não paga venda. Isso vai aparecer no laudo.' : v === 'sou_eu' ? 'Você é o comercial. Então o laudo vai olhar pro seu horário, não pro seu salário.' : null),
+  S6: 'Bloco fechado. Duas perguntas abertas, opcionais, e o laudo sai.',
+}
+
+const MENSAGENS_TRANSICAO_LEAD = [
+  'Pronto. O radar, os selos e as condecorações já estão no card.',
+  'A parte que vale dinheiro é o resto do laudo: o SWOT da clínica, a oferta certa pro seu caso e a mensagem que eu mandaria pra você. Isso eu entrego no WhatsApp.',
+  'Onde te mando?',
+]
+
+const ANALISE_FRASES = [
+  'Lendo suas respostas…',
+  'Cruzando preço com papel comercial…',
+  'Checando se tráfego cabe agora…',
+  'Roteando a oferta…',
+]
+
+// ---------------------------------------------------------------------------
+// Condecorações (18). when(a, r) recebe answers normalizadas e o resultado do motor.
+// ---------------------------------------------------------------------------
+
+const L = (a, id) => a.likert[id]
+const S = (a, id) => a.categoricas[id]
+
+const BADGES = [
+  { id: 'preco_por_margem', icon: '🧮', nome: 'Preço por margem', blurb: 'Tabela feita com custo e posicionamento, não olhando a concorrente.', when: (a) => L(a, 'P2') === 4 },
+  { id: 'valor_cheio', icon: '💎', nome: 'Valor cheio', blurb: 'Desconto é exceção com regra, não idioma.', when: (a) => L(a, 'P3') >= 3 },
+  { id: 'protocolo_nao_sessao', icon: '📋', nome: 'Protocolo, não sessão', blurb: 'O produto principal é plano, não sessão avulsa.', when: (a) => L(a, 'P4') === 4 },
+  { id: 'avaliacao_com_processo', icon: '🩺', nome: 'Avaliação com processo', blurb: 'Preço só entra depois do plano.', when: (a) => L(a, 'P6') === 4 },
+  { id: 'conteudo_que_abre_conversa', icon: '🗣️', nome: 'Conteúdo que abre conversa', blurb: 'O Instagram fala de problema e resultado, não só de tabela.', when: (a) => L(a, 'P7') >= 3 },
+  { id: 'roteiro_do_oi_ao_pix', icon: '🧭', nome: 'Roteiro do oi ao pix', blurb: 'O atendimento não depende do humor de quem pegou o celular.', when: (a) => L(a, 'C1') >= 3 },
+  { id: 'mede_a_taxa', icon: '📈', nome: 'Mede a taxa', blurb: 'Sabe quantas conversas viram avaliação e quantas viram protocolo.', when: (a) => L(a, 'C2') === 4 },
+  { id: 'followup_com_data', icon: '📅', nome: 'Follow-up com data', blurb: '"Vou pensar" entra numa sequência, não no limbo.', when: (a) => L(a, 'C3') >= 3 },
+  { id: 'uma_clinica_so', icon: '🪞', nome: 'Uma clínica só', blurb: 'Anúncio, recepção e avaliação prometem a mesma coisa.', when: (a) => L(a, 'C7') >= 3 },
+  { id: 'agenda_sem_depender_do_post', icon: '🧱', nome: 'Agenda sem depender do post', blurb: 'Sete dias sem postar e a agenda não sente.', when: (a) => L(a, 'CAP1') !== null && L(a, 'CAP1') <= 2 },
+  { id: 'sabe_a_origem', icon: '🧭', nome: 'Sabe a origem', blurb: 'Cada paciente da semana tem canal registrado.', when: (a) => L(a, 'CAP2') === 4 },
+  { id: 'anuncio_com_proximo_passo', icon: '🎯', nome: 'Anúncio com próximo passo', blurb: 'Post e anúncio pedem avaliação, não só mostram resultado bonito.', when: (a) => L(a, 'CAP3') >= 3 },
+  { id: 'cobertura_real', icon: '🕘', nome: 'Cobertura real', blurb: 'O WhatsApp tem horário de cobertura, não "quando der".', when: (a) => L(a, 'WA1') >= 3 },
+  { id: 'followup_automatico', icon: '⚙️', nome: 'Follow-up automático', blurb: 'Ninguém precisa lembrar de cobrar o "vou pensar".', when: (a) => L(a, 'WA3') >= 3 },
+  { id: 'closer_de_verdade', icon: '🤝', nome: 'Closer de verdade', blurb: 'Alguém conduz protocolo de ticket alto sem te chamar.', when: (a) => S(a, 'S2') === 'sim' },
+  { id: 'comissao_por_protocolo', icon: '💰', nome: 'Comissão por protocolo', blurb: 'Quem vende ganha quando fecha, não quando despacha.', when: (a) => S(a, 'S3') === 'fixo_protocolo' },
+  { id: 'lead_21h_vivo', icon: '🌙', nome: 'Lead das 21h vivo', blurb: 'Fora de hora tem fluxo que segura a conversa e marca.', when: (a) => S(a, 'S5') === 'fluxo_marca' },
+  { id: 'lead_e_venda', icon: '🎓', nome: 'Lead é venda', blurb: 'A clínica trata lead como alguém a ser vendido com ética e processo.', when: (a) => S(a, 'S6') === 'vendida_com_processo' },
+]
+
+// ---------------------------------------------------------------------------
+// Personas: flavor determinístico (o texto completo vem do laudo via LLM)
+// ---------------------------------------------------------------------------
+
+const PERSONA_FLAVOR = {
+  rainha_do_conteudo_agenda_oca: 'Posta todo dia, a agenda sente quando para. Falta oferta e próximo passo no que sai.',
+  clinica_quanto_custa: 'O Instagram educa o público a perguntar preço. A conversa nasce no balcão de tabela.',
+  avaliacao_que_nao_fecha: 'Gente chega. Avaliação acontece. O protocolo não sai. O ralo é a conversa, não o tráfego.',
+  secretaria_no_front: 'Quem responde o digital foi montada pra atender, não pra vender. Lead pede preço e some.',
+  dona_no_plantao_21h: 'Você é o comercial 24h. O que chega fora do horário morre até a manhã seguinte.',
+  desconto_como_idioma: 'A clínica fecha. Fecha barato. Anúncio agora treina mais gente a negociar.',
+  indicacao_cansada: 'A agenda vive de indicação sem sistema. Quando a indicação para, para tudo.',
+  fecha_barato_sonha_caro: 'Vende o procedimento de entrada e sonha com o de ticket alto. O comercial atrai a paciente errada.',
+  ferramenta_sem_metodo: 'Já teve robô. Ele mandava tabela em escala. Falta o método, não a ferramenta.',
+  pronta_para_o_sistema: 'Os quatro eixos aguentam volume. O próximo passo é sistema, não remendo.',
+  atendimento_no_lugar_de_venda: 'Tem alguém no WhatsApp. Não tem comercial. A cadeira foi precificada como secretária e cobrada como closer.',
+  agenda_cheia_caixa_magro: 'A agenda lota e o caixa não reflete. O problema é preço e protocolo, não paciente.',
+}
+
+const PERSONA_TITULOS = PERSONAS
+
+const OFERTA_TITULOS = {
+  CONSULTORIA: 'Consultoria de oferta e preço',
+  COMERCIAL: 'Processo comercial',
+  IA_AUTOMACAO: 'IA de atendimento',
+  TRAFEGO: 'Tráfego de conversão',
+  PACOTE_COMPLETO: 'Pacote completo',
+  DIAGNOSTICO_PONTUAL: 'Diagnóstico pontual',
+}
+
+const SELO_PRECO = {
+  preco_no_controle: { label: 'Preço no controle', tom: 'top' },
+  tabela_fragil: { label: 'Tabela frágil', tom: 'mid' },
+  desconto_como_habito: { label: 'Desconto como hábito', tom: 'low' },
+}
+
+const SELO_PAPEL = {
+  closer_existente: { label: 'Closer existente', tom: 'top' },
+  dona_vende: { label: 'Dona vende', tom: 'mid' },
+  secretaria_no_comercial: { label: 'Secretária no comercial', tom: 'mid' },
+  funcao_ausente: { label: 'Função comercial ausente', tom: 'low' },
+}
+
+// ---------------------------------------------------------------------------
+// Tradução das flags em frase de clínica
+// ---------------------------------------------------------------------------
+
+const FLAG_FRASE = {
+  funcao_comercial_inexistente: 'A clínica contratou atendimento, não venda: fixo baixo, sem comissão, só informa valor',
+  vendedora_fantasia: 'O cargo no discurso é comercial; o contrato é recepção remota',
+  secretaria_informa_preco: 'Secretária informa preço no lugar de qualificar',
+  closer_inexistente: 'Ninguém fecha protocolo de ticket alto sem chamar a dona',
+  dona_e_o_comercial: 'A dona é o comercial da clínica',
+  remuneracao_sem_comissao: 'Quem responde o digital não ganha nada quando fecha',
+  salario_comercial_abaixo_1500: 'Cadeira comercial remunerada como recepção',
+  papel_digital_sem_dono: 'O WhatsApp tem várias mãos e nenhum dono',
+  desconto_habito: 'Desconto é regra, não exceção',
+  preco_por_concorrente: 'Preço definido olhando a concorrente, não a margem',
+  nao_sabe_custo_do_protocolo: 'Custo real do protocolo desconhecido',
+  vende_sessao_nao_protocolo: 'Vende sessão avulsa como produto principal',
+  avaliacao_balcao_de_tabela: 'Avaliação funciona como balcão de tabela',
+  preco_no_instagram_sem_qualificar: 'O conteúdo educa o público a perguntar só "quanto custa?"',
+  caixa_confundido_com_receita: 'Pacote parcelado tratado como faturamento do mês',
+  lead_21h_morto: 'Lead fora do horário morre até o dia seguinte',
+  followup_inexistente: 'Follow-up depende de alguém lembrar',
+  whatsapp_sem_dono: 'Sem horário de cobertura real no WhatsApp',
+  bot_que_so_manda_tabela: 'Já teve robô, e ele só mandava tabela',
+  historico_se_perde_no_celular: 'Histórico do lead se perde quando troca o celular',
+  gap_captacao: 'Captação abaixo do mínimo pra encher agenda',
+  depende_de_postar: 'Se parar de postar sete dias, a agenda sente',
+  nao_sabe_origem_do_paciente: 'Não sabe o canal de origem de cada paciente',
+  indicacao_nao_sistematizada: 'Indicação sem pedido e sem registro',
+  conteudo_sem_proximo_passo: 'Post e anúncio sem oferta e sem próximo passo',
+  gap_comercial: 'Conversão abaixo do mínimo pra aguentar volume',
+  nao_mede_taxa_de_fechamento: 'Não mede quantas avaliações viram protocolo',
+  avaliacao_sem_roteiro: 'Avaliação sem roteiro do "oi" ao fechamento',
+  profissional_e_venda_misturados: 'Quem executa e quem vende se atrapalham',
+  no_show_ignorado: 'No-show de avaliação sem medição e sem recuperação',
+  mensagem_anuncio_diferente_da_recepcao: 'Uma clínica no Instagram, outra no balcão',
+}
+
+const FLAGS_CONTEXTO = new Set([
+  'agenda_folgada', 'agenda_oscila', 'cheia_de_avaliacao_pouco_fechamento', 'cheia_caixa_nao_reflete', 'dona_no_limite',
+  'orcamento_ate_1k', 'orcamento_1k_3k', 'orcamento_3k_8k', 'orcamento_acima_8k', 'quer_entender_antes',
+])
+
+function flagsTraduzidas(flags) {
+  return flags.filter((f) => !FLAGS_CONTEXTO.has(f) && FLAG_FRASE[f]).map((f) => FLAG_FRASE[f])
+}
+
+// ---------------------------------------------------------------------------
+// Notas por eixo (1 frase, determinística)
+// ---------------------------------------------------------------------------
+
+function notaEixo(id, r) {
+  const has = (f) => r.flags.includes(f)
+  const s = r.scores[id]
+  if (s === null) return null
+  switch (id) {
+    case 'marca_demanda':
+      if (has('preco_no_instagram_sem_qualificar')) return 'O conteúdo abre conversa de preço, não de problema.'
+      if (has('mensagem_anuncio_diferente_da_recepcao')) return 'O que o Instagram promete não é o que a recepção fala.'
+      if (has('conteudo_sem_proximo_passo')) return 'Falta oferta e próximo passo no que sai.'
+      return s >= LIMIAR_OK ? 'Mensagem alinhada do post ao balcão.' : 'Marca comunica, mas ainda não puxa avaliação.'
+    case 'captacao':
+      if (has('depende_de_postar') && has('gap_captacao')) return 'A agenda depende de postar. Sem sistema por trás.'
+      if (has('nao_sabe_origem_do_paciente')) return 'Sem saber a origem, não dá pra escalar o canal certo.'
+      if (has('gap_captacao')) return 'Entra pouca gente, ou entra gente de preço.'
+      return s >= LIMIAR_OK ? 'Captação aguenta receber volume.' : 'Captação existe, mas sem controle de canal.'
+    case 'conversao':
+      if (has('funcao_comercial_inexistente')) return 'Sem função comercial, o lead vira tabela enviada.'
+      if (has('desconto_habito')) return 'Fecha, mas fecha barato. Desconto virou idioma.'
+      if (has('avaliacao_balcao_de_tabela')) return 'A avaliação entrega preço antes do plano.'
+      if (has('nao_mede_taxa_de_fechamento')) return 'Vocês não medem a taxa de fechamento.'
+      return s >= LIMIAR_OK ? 'Processo que fecha e mede.' : 'Conversa existe, mas sem roteiro fechando.'
+    case 'equipe_sistema':
+      if (has('funcao_comercial_inexistente')) return 'A cadeira comercial não existe. Existe atendimento.'
+      if (has('lead_21h_morto') && has('followup_inexistente')) return 'Lead fora de hora morre e ninguém cobra o "vou pensar".'
+      if (has('lead_21h_morto')) return 'O ralo está no intervalo entre o "oi" e a avaliação.'
+      if (has('dona_e_o_comercial')) return 'A dona segura o comercial. Não escala.'
+      return s >= LIMIAR_OK ? 'Papel definido e WhatsApp com sistema.' : 'Papel comercial pouco definido.'
+    default:
+      return null
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SWOT determinístico (pré-laudo). O laudo do LLM substitui isto na fase 2.
+// ---------------------------------------------------------------------------
+
+function swotDeterministico(r, a) {
+  const has = (f) => r.flags.includes(f)
+  const forcas = []
+  const fraquezas = flagsTraduzidas(r.flags).slice(0, 4)
+  const oportunidades = []
+  const alertas = []
+
+  for (const e of EIXOS) {
+    if (r.scores[e.id] !== null && r.scores[e.id] >= LIMIAR_OK) forcas.push(`${e.longo} acima do mínimo pra receber volume`)
+  }
+  if (L(a, 'C2') === 4) forcas.push('Mede conversas, avaliações e protocolos fechados')
+  if (L(a, 'P6') === 4) forcas.push('Avaliação com processo: preço só depois do plano')
+  if (S(a, 'S2') === 'sim') forcas.push('Existe quem fecha ticket alto sem chamar a dona')
+  if (L(a, 'P3') >= 3) forcas.push('Vende no valor cheio na maior parte dos fechamentos')
+  if (L(a, 'C3') >= 3) forcas.push('"Vou pensar" entra em follow-up com data')
+  if (!forcas.length) forcas.push('A dona respondeu com honestidade. Isso é o primeiro ativo do laudo.')
+
+  const o = r.oferta.principal
+  if (o === 'PACOTE_COMPLETO') oportunidades.push('Anúncio de conversão + roteiro + IA no fora de hora, juntos', 'Separar recepção (agenda) de closer (qualifica e conduz)')
+  if (o === 'COMERCIAL') oportunidades.push('Roteiro do primeiro "oi" ao fechamento, com quem conduz definido', 'Avaliação que descobre orçamento e decisão antes do menu')
+  if (o === 'IA_AUTOMACAO') oportunidades.push('IA que qualifica e marca avaliação no fora de hora, sem despachar tabela', 'Follow-up do "vou pensar" que não depende de memória')
+  if (o === 'TRAFEGO') oportunidades.push('Volume certo em cima de um comercial que já aguenta', 'Anúncio com oferta e próximo passo, não resultado bonito')
+  if (o === 'CONSULTORIA') oportunidades.push('Reescrever oferta: protocolo acima de sessão, preço depois do plano', 'Tabela, regra de desconto e quem autoriza')
+  if (o === 'DIAGNOSTICO_PONTUAL') oportunidades.push('Medir três números antes de comprar qualquer sistema', 'Fechar o ralo mais barato primeiro')
+  if (has('dona_e_o_comercial')) oportunidades.push('Mesmo com a dona no comercial: script, horário e meta')
+  if (r.oferta.complementar === 'IA_AUTOMACAO') oportunidades.push('IA segura o fora de hora; humano fecha o ticket alto')
+
+  if (r.oferta.trafego_proibido_passo_1) alertas.push('Mais tráfego agora multiplica o "quanto custa?"')
+  if (has('remuneracao_sem_comissao') && has('salario_comercial_abaixo_1500')) alertas.push('Sem comissão e com fixo baixo, a pessoa otimiza pra despachar conversa, não pra fechar')
+  if (has('bot_que_so_manda_tabela') || has('secretaria_informa_preco')) alertas.push('IA que só manda valor reproduz a secretária, em escala')
+  if (has('caixa_confundido_com_receita')) alertas.push('Caixa de pacote parcelado não é receita do mês')
+  if (has('dona_no_limite')) alertas.push('Encher mais a agenda agora quebra a dona antes de quebrar o caixa')
+  if (has('lead_21h_morto')) alertas.push('Cada lead das 21h que morre é anúncio pago pra ninguém')
+  if (!alertas.length) alertas.push('Não escalar verba antes de medir taxa de fechamento por 30 dias')
+
+  return {
+    forcas: forcas.slice(0, 4),
+    fraquezas,
+    oportunidades: oportunidades.slice(0, 4),
+    alertas: alertas.slice(0, 4),
+  }
+}
+
+const NUMEROS_PEDIR = ['Avaliações por semana', '% que fecha em 7 dias', 'Ticket médio do último mês']
+
+
+// ---- app/scripts/app.js
+// Raio-X da Clínica: chat guiado + laudo preenchido ao vivo.
+// O motor (lib/score.js) calcula. Este arquivo só conduz e desenha.
+
+
+
+
+// ---------------------------------------------------------------------------
+// Estado
+// ---------------------------------------------------------------------------
+
+const STORAGE_KEY = 'raio_x_clinica_v1'
+const state = {
+  view: 'intro',
+  cursor: 0,
+  answers: answersVazio(),
+  lead: null,
+  revealed: false,
+  unlocked: new Set(),
+  bumps: 0,
+}
+
+const $ = (sel, root = document) => root.querySelector(sel)
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)]
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      view: state.view, cursor: state.cursor, answers: state.answers, lead: state.lead, revealed: state.revealed, unlocked: [...state.unlocked],
+    }))
+  } catch (_) {}
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return false
+    const s = JSON.parse(raw)
+    if (!s || !s.answers) return false
+    state.view = s.view || 'intro'
+    state.cursor = s.cursor || 0
+    state.answers = { ...answersVazio(), ...s.answers }
+    state.lead = s.lead || null
+    state.revealed = !!s.revealed
+    state.unlocked = new Set(s.unlocked || [])
+    return true
+  } catch (_) { return false }
+}
+
+function reset() {
+  try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
+  location.reload()
+}
+
+// ---------------------------------------------------------------------------
+// Passos
+// ---------------------------------------------------------------------------
+
+function buildSteps() {
+  const steps = []
+  for (const html of MENSAGENS_INTRO) steps.push({ type: 'message', html, secao: 'perfil' })
+  for (const p of PERGUNTAS) {
+    steps.push({ type: 'question', ...p })
+    const m = MENSAGENS_DEPOIS[p.id]
+    if (m) steps.push({ type: 'message', fn: typeof m === 'function' ? m : () => m, secao: p.secao, after: p })
+  }
+  for (const html of MENSAGENS_TRANSICAO_LEAD) steps.push({ type: 'message', html, secao: 'extra' })
+  steps.push({ type: 'lead-form', secao: 'extra' })
+  return steps
+}
+const STEPS = buildSteps()
+
+function getAnswer(p) { return state.answers[p.grupo][p.id] }
+function setAnswer(p, v) { state.answers[p.grupo][p.id] = v }
+function hasAnswer(p) {
+  const v = getAnswer(p)
+  if (Array.isArray(v)) return v.length > 0
+  return v !== null && v !== undefined && v !== ''
+}
+function labelDe(p, v) {
+  if (p.tipo === 'likert') return LIKERT_OPCOES.find((o) => o.valor === v)?.label || String(v)
+  if (p.tipo === 'multi') return (v || []).map((k) => p.opcoes[k]).join(' · ')
+  if (p.tipo === 'texto') return v
+  return p.opcoes?.[v] || String(v)
+}
+
+function interpolar(html) {
+  const nome = (state.answers.lead.nome || '').trim().split(' ')[0]
+  return html.replaceAll('{nome}', esc(nome || 'você'))
+}
+
+// ---------------------------------------------------------------------------
+// Views
+// ---------------------------------------------------------------------------
+
+function setView(v) {
+  state.view = v
+  document.body.dataset.view = v
+  $$('.view').forEach((el) => el.setAttribute('aria-hidden', el.dataset.view === v ? 'false' : 'true'))
+  save()
+}
+
+// ---------------------------------------------------------------------------
+// Chat
+// ---------------------------------------------------------------------------
+
+const stackEl = () => $('[data-stack]')
+const TIMING = { typing: 800, typingCascade: 650, pause: 450, beforeQuestion: 500, afterUser: 350 }
+let timer = null
+function schedule(fn, ms) { clearTimeout(timer); timer = setTimeout(fn, reduceMotion ? Math.min(ms, 120) : ms) }
+
+function avatarHtml() {
+  return `<span class="bubble__avatar" aria-hidden="true">${esc(CONFIG.guiaIniciais)}</span>`
+}
+
+function scrollTo(el, block = 'end') {
+  setTimeout(() => el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block }), 30)
+}
+
+function appendBot(html, stepIndex) {
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--bot'
+  li.dataset.stepIndex = stepIndex
+  li.innerHTML = `${avatarHtml()}<div class="bubble__text">${interpolar(html)}</div>`
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+  if (li.querySelector('[data-onboarding-result]')) nudgeReport()
+}
+
+function appendUser(p, stepIndex) {
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--user'
+  li.dataset.stepIndex = stepIndex
+  li.dataset.qid = p.id
+  const v = getAnswer(p)
+  const text = hasAnswer(p) ? labelDe(p, v) : 'Pulei essa.'
+  li.innerHTML = `<span class="bubble__text">${esc(text)}</span><button type="button" class="bubble__edit" aria-label="Editar esta resposta" title="Editar"><span aria-hidden="true">✎</span></button>`
+  li.querySelector('.bubble__edit').addEventListener('click', () => goBack(stepIndex))
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+}
+
+function showTyping() {
+  hideTyping()
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--typing'
+  li.dataset.typing = '1'
+  li.innerHTML = `${avatarHtml()}<div class="bubble__text"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+}
+function hideTyping() { $('[data-typing]')?.remove() }
+
+function appendQuestion(step, stepIndex) {
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--question'
+  li.dataset.stepIndex = stepIndex
+  li.dataset.active = 'question'
+
+  const current = getAnswer(step)
+  let body = ''
+  if (step.tipo === 'texto') {
+    body = `<input type="text" id="q-${step.id}" class="q__input" data-input placeholder="${esc(step.placeholder)}" maxlength="120" value="${esc(current || '')}" autocomplete="off" spellcheck="false">`
+  } else if (step.tipo === 'likert') {
+    body = `<div class="q__options q__options--likert" role="group">${LIKERT_OPCOES.map((o) => `
+      <button type="button" class="q__option" data-value="${o.valor}" aria-pressed="${current === o.valor}"><span class="q__scale">${o.valor}</span>${esc(o.label)}</button>`).join('')}</div>`
+  } else {
+    const sel = Array.isArray(current) ? current : current ? [current] : []
+    body = `<div class="q__options" role="group">${Object.entries(step.opcoes).map(([k, label]) => `
+      <button type="button" class="q__option" data-value="${esc(k)}" aria-pressed="${sel.includes(k)}">${esc(label)}</button>`).join('')}</div>`
+  }
+
+  const precisaBotao = step.tipo === 'texto' || step.tipo === 'multi'
+  const nav = precisaBotao || step.opcional ? `<nav class="q__nav">
+      ${step.opcional ? '<button type="button" class="q__btn q__btn--ghost" data-skip>Pular</button>' : '<span></span>'}
+      ${precisaBotao ? `<button type="button" class="q__btn q__btn--primary" data-next ${hasAnswer(step) ? '' : 'disabled'}>Continuar <span aria-hidden="true">→</span></button>` : ''}
+    </nav>` : ''
+
+  li.innerHTML = `<article class="q">
+      <span class="q__section">${esc(SECOES[step.secao] || step.secao)}</span>
+      <p class="q__prompt">${interpolar(esc(step.prompt))}</p>
+      ${body}${nav}
+    </article>`
+
+  const nextBtn = li.querySelector('[data-next]')
+  const skipBtn = li.querySelector('[data-skip]')
+
+  if (step.tipo === 'texto') {
+    const input = li.querySelector('[data-input]')
+    input.addEventListener('input', () => {
+      const v = input.value.trim()
+      setAnswer(step, v)
+      nextBtn.disabled = v.length < 1
+      save()
+    })
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !nextBtn.disabled) { e.preventDefault(); advance(stepIndex) } })
+    setTimeout(() => input.focus({ preventScroll: true }), 120)
+  } else {
+    let auto = null
+    li.querySelectorAll('.q__option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const raw = btn.dataset.value
+        if (step.tipo === 'multi') {
+          const arr = Array.isArray(getAnswer(step)) ? [...getAnswer(step)] : []
+          const i = arr.indexOf(raw)
+          if (i >= 0) arr.splice(i, 1)
+          else if (arr.length < (step.max || 99)) arr.push(raw)
+          else return
+          setAnswer(step, arr)
+          li.querySelectorAll('.q__option').forEach((b) => b.setAttribute('aria-pressed', arr.includes(b.dataset.value)))
+          nextBtn.disabled = arr.length === 0
+          save()
+          liveUpdate()
+          return
+        }
+        const v = step.tipo === 'likert' ? Number(raw) : raw
+        setAnswer(step, v)
+        li.querySelectorAll('.q__option').forEach((b) => b.setAttribute('aria-pressed', 'false'))
+        btn.setAttribute('aria-pressed', 'true')
+        save()
+        clearTimeout(auto)
+        auto = setTimeout(() => { if (li.isConnected && li.dataset.active === 'question') advance(stepIndex) }, reduceMotion ? 60 : 380)
+      })
+    })
+  }
+  nextBtn?.addEventListener('click', () => advance(stepIndex))
+  skipBtn?.addEventListener('click', () => { setAnswer(step, ''); advance(stepIndex) })
+
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li, 'center')
+}
+
+function appendLeadCard(stepIndex) {
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--question bubble--lead'
+  li.dataset.stepIndex = stepIndex
+  li.dataset.active = 'lead'
+  li.innerHTML = `<article class="q q--card">
+      <form class="lead" data-lead-form novalidate>
+        <label class="lead__field"><span>WhatsApp</span>
+          <input type="tel" id="lead-whatsapp" name="whatsapp" required autocomplete="tel" inputmode="tel" placeholder="(11) 9XXXX-XXXX" data-whats></label>
+        <label class="lead__field"><span>E-mail (opcional)</span>
+          <input type="email" id="lead-email" name="email" autocomplete="email" inputmode="email" placeholder="voce@clinica.com.br"></label>
+        <nav class="q__nav q__nav--end">
+          <button type="submit" class="q__btn q__btn--primary">Liberar meu laudo <span aria-hidden="true">→</span></button>
+        </nav>
+        <p class="lead__error" role="alert" hidden></p>
+        <p class="lead__fine">Suas respostas só geram o seu laudo. Nada é compartilhado.</p>
+      </form>
+    </article>`
+  const whats = li.querySelector('[data-whats]')
+  whats.addEventListener('input', () => { whats.value = fmtPhone(whats.value) })
+  li.querySelector('[data-lead-form]').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const err = li.querySelector('.lead__error')
+    const digits = whats.value.replace(/\D/g, '')
+    if (digits.length < 10 || digits.length > 11) {
+      err.textContent = 'Coloca o WhatsApp com DDD. É pra lá que o laudo vai.'
+      err.hidden = false
+      whats.focus()
+      return
+    }
+    err.hidden = true
+    state.lead = { whatsapp: digits, email: li.querySelector('#lead-email').value.trim(), em: new Date().toISOString() }
+    li.dataset.active = ''
+    li.querySelectorAll('input,button').forEach((el) => { el.disabled = true })
+    save()
+    enviarParaApi()
+    startAnalysis(stepIndex)
+  })
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li, 'center')
+  setTimeout(() => whats.focus({ preventScroll: true }), 150)
+}
+
+function fmtPhone(s) {
+  const d = s.replace(/\D/g, '').slice(0, 11)
+  if (d.length <= 2) return d
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
+
+// Motor do fluxo -------------------------------------------------------------
+
+function runFrom(cursor, first = true) {
+  state.cursor = cursor
+  save()
+  if (cursor >= STEPS.length) return
+  const step = STEPS[cursor]
+  if (step.type === 'message') {
+    const html = step.fn ? step.fn(getAnswer(step.after), state.answers, currentResult()) : step.html
+    if (!html) return runFrom(cursor + 1, first)
+    schedule(() => {
+      showTyping()
+      schedule(() => {
+        hideTyping()
+        appendBot(html, cursor)
+        schedule(() => runFrom(cursor + 1, false), TIMING.pause)
+      }, first ? TIMING.typing : TIMING.typingCascade)
+    }, first ? TIMING.afterUser : TIMING.pause)
+    return
+  }
+  schedule(() => {
+    if (step.type === 'question') appendQuestion(step, cursor)
+    else if (step.type === 'lead-form') appendLeadCard(cursor)
+    updateProgress()
+  }, first ? TIMING.beforeQuestion : TIMING.pause)
+}
+
+function advance(stepIndex) {
+  const step = STEPS[stepIndex]
+  const li = $(`[data-step-index="${stepIndex}"][data-active]`)
+  if (li) li.remove()
+  appendUser(step, stepIndex)
+  liveUpdate()
+  runFrom(stepIndex + 1, true)
+}
+
+function goBack(stepIndex) {
+  clearTimeout(timer)
+  hideTyping()
+  $$('[data-step-index]').forEach((el) => { if (Number(el.dataset.stepIndex) >= stepIndex) el.remove() })
+  runFrom(stepIndex, false)
+}
+
+function currentResult() { return avaliar(state.answers) }
+
+// ---------------------------------------------------------------------------
+// Laudo (template compartilhado entre preview da intro e laudo real)
+// ---------------------------------------------------------------------------
+
+const ATTR_ICON = {
+  nome: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
+  papel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>',
+  foco: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 3-6 6-6 10a6 6 0 0 0 12 0c0-4-3-7-6-10z"/></svg>',
+  agenda: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+}
+
+const SWOT_ICON = {
+  forcas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14c0-3 2-5 5-5h2l3-3v6l-3 3v3a3 3 0 0 1-3 3H8a2 2 0 0 1-2-2z"/></svg>',
+  fraquezas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a5 5 0 0 1 0-7l3-3a5 5 0 0 1 7 7l-1.5 1.5"/><path d="M14 10a5 5 0 0 1 0 7l-3 3a5 5 0 0 1-7-7l1.5-1.5"/></svg>',
+  oportunidades: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>',
+  alertas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+}
+
+const SWOT_TITULO = { forcas: 'Forças', fraquezas: 'Fraquezas', oportunidades: 'Oportunidades', alertas: 'Alertas' }
+const SWOT_TOM = { forcas: 'is-positive', fraquezas: 'is-negative', oportunidades: 'is-opportunity', alertas: 'is-alert' }
+
+function mesAno() {
+  return new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()
+}
+
+function reportTemplate() {
+  const radarLabel = (eixo, x, y, anchor, valueFirst) => {
+    const v = `<text x="${x}" y="${valueFirst ? y : y + 24}" font-size="20" font-weight="800" data-radar-value="${eixo.id}" fill="#F6F2E7">—</text>`
+    const l = `<text x="${x}" y="${valueFirst ? y + 24 : y}" font-size="11" font-weight="700" letter-spacing="2" fill="#F6F2E7" opacity=".8">${eixo.radar}</text>`
+    return `<g text-anchor="${anchor}" font-family="Figtree, system-ui, sans-serif">${v}${l}</g>`
+  }
+  return `
+  <div class="report__analyzing" data-analyzing hidden>
+    <span class="report__pill"><span class="report__pill-dot" aria-hidden="true">●</span> analisando</span>
+    <span class="report__pill-sub" data-analyzing-sub>${ANALISE_FRASES[0]}</span>
+  </div>
+  <header class="report__intro">
+    <div class="intro-top">
+      <span class="tagline"><span class="tagline__rule"></span><span class="tagline__label">raio-x da clínica</span></span>
+      <span class="intro-meta">${mesAno()}</span>
+    </div>
+    <h2 class="intro-title">Diagnóstico comercial da clínica</h2>
+    <div class="intro-body">
+      <ul class="profile" data-ident>
+        ${['nome', 'papel', 'foco', 'agenda'].map((k) => `
+        <li class="attr" data-ident-key="${k}">
+          <span class="attr__icon" aria-hidden="true">${ATTR_ICON[k]}</span>
+          <span class="attr__body"><span class="attr__key">${{ nome: 'Nome', papel: 'Papel', foco: 'Linha', agenda: 'Agenda' }[k]}</span><span class="attr__val" data-empty>—</span></span>
+        </li>`).join('')}
+      </ul>
+      <div class="trophy" data-trophy>
+        <div class="trophy__head"><span class="trophy__label">Persona</span><span class="trophy__rule"></span></div>
+        <div class="trophy__body">
+          <span class="trophy__emblem" aria-hidden="true">✦</span>
+          <div class="trophy__name is-pending" data-persona>???</div>
+        </div>
+        <p class="trophy__flavor" data-persona-flavor>Sua persona aparece aqui quando você terminar de responder.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="report__section">
+    <div class="section-head"><span class="section-num">01</span><h3>Radar</h3><span class="section-meta">4 eixos</span></div>
+    <div class="radar-card">
+      <svg viewBox="0 0 500 460" role="img" aria-label="Radar dos 4 eixos: marca, captação, conversão e equipe">
+        <defs data-radar-defs></defs>
+        <g fill="none" stroke="rgba(246,242,231,0.10)" stroke-width="1">
+          <polygon points="250,70 410,230 250,390 90,230"/><polygon points="250,110 370,230 250,350 130,230"/>
+          <polygon points="250,150 330,230 250,310 170,230"/><polygon points="250,190 290,230 250,270 210,230"/>
+        </g>
+        <g stroke="rgba(246,242,231,0.10)" stroke-width="1" stroke-dasharray="3,4"><line x1="250" y1="70" x2="250" y2="390"/><line x1="90" y1="230" x2="410" y2="230"/></g>
+        <g fill-opacity="0.55" data-radar-quadrants></g>
+        <g fill="none" stroke-width="2" stroke-linejoin="round" data-radar-edges></g>
+        <g stroke="#041B15" stroke-width="1.5" data-radar-points></g>
+        ${radarLabel(EIXOS[0], 250, 28, 'middle', true)}
+        ${radarLabel(EIXOS[1], 496, 222, 'end', false)}
+        ${radarLabel(EIXOS[2], 250, 420, 'middle', false)}
+        ${radarLabel(EIXOS[3], 4, 222, 'start', false)}
+      </svg>
+    </div>
+    <div class="scores" data-scores>
+      ${EIXOS.map((e) => `
+      <div class="score is-none" data-score="${e.id}">
+        <span class="score__icon" aria-hidden="true">${e.icon}</span>
+        <div class="score__body">
+          <div class="score__label">${e.longo}</div>
+          <div class="score__bar"><div class="score__fill" style="width:0%"></div></div>
+          <div class="score__note is-pending" data-note>Preenche conforme você responde.</div>
+        </div>
+        <span class="score__value" data-value>—</span>
+      </div>`).join('')}
+    </div>
+    <div class="selos" data-selos>
+      <span class="selo is-pending" data-selo="preco"><span class="selo__key">Preço</span><span class="selo__val">—</span></span>
+      <span class="selo is-pending" data-selo="papel"><span class="selo__key">Quem vende</span><span class="selo__val">—</span></span>
+    </div>
+  </section>
+
+  <section class="report__section">
+    <div class="section-head"><span class="section-num">02</span><h3>Condecorações</h3><span class="section-meta" data-badges-meta>0 conquistadas</span></div>
+    <div class="badges-meta"><span class="badges-count" data-badges-count>0 / ${BADGES.length}</span></div>
+    <div class="badge-grid" data-badges>
+      ${BADGES.map((b) => `<div class="badge locked" data-badge="${b.id}" data-tooltip="${esc(b.blurb)}" tabindex="0"><span class="badge__emoji" aria-hidden="true">${b.icon}</span><span class="badge__name">${esc(b.nome)}</span></div>`).join('')}
+    </div>
+  </section>
+
+  <section class="report__section report__section--gated" data-gated>
+    <div class="section-head"><span class="section-num">03</span><h3>SWOT</h3><span class="section-meta">leitura da clínica</span></div>
+    <div class="swot-grid">
+      ${Object.keys(SWOT_TITULO).map((k) => `
+      <div class="swot ${SWOT_TOM[k]}">
+        <div class="swot__head"><span class="swot__icon" aria-hidden="true">${SWOT_ICON[k]}</span><span class="swot__title">${SWOT_TITULO[k]}</span></div>
+        <ul class="swot__list" data-swot="${k}"><li class="is-pending">Liberado com o laudo.</li></ul>
+      </div>`).join('')}
+    </div>
+  </section>
+
+  <section class="report__section report__section--gated" data-gated>
+    <div class="section-head"><span class="section-num">04</span><h3>Próximo passo</h3><span class="section-meta">uma oferta, não um menu</span></div>
+    <div class="offer" data-offer>
+      <p class="offer__pending is-pending">O roteamento aparece aqui com o laudo.</p>
+    </div>
+  </section>
+
+  <footer class="report__footer">
+    <span class="footer-note" data-footer-note></span>
+    <div class="report__actions">
+      <button type="button" class="btn-act btn-act--primary" data-action="copy" disabled data-tooltip="Libera quando o laudo sair.">Copiar resumo</button>
+      <button type="button" class="btn-act" data-action="print" disabled data-tooltip="Libera quando o laudo sair.">Baixar PDF</button>
+    </div>
+  </footer>`
+}
+
+// Renderização ---------------------------------------------------------------
+
+function tierClass(el, f) {
+  el.classList.remove('is-top', 'is-good', 'is-mid', 'is-low', 'is-none')
+  el.classList.add(`is-${f}`)
+}
+
+function renderRadar(root, scores) {
+  const cx = 250, cy = 230, maxR = 160
+  const val = (id) => (scores[id] === null || scores[id] === undefined ? 0 : scores[id])
+  const pts = [
+    [cx, cy - maxR * (val('marca_demanda') / 100)],
+    [cx + maxR * (val('captacao') / 100), cy],
+    [cx, cy + maxR * (val('conversao') / 100)],
+    [cx - maxR * (val('equipe_sistema') / 100), cy],
+  ]
+  const cols = EIXOS.map((e) => COR_FAIXA[faixa(scores[e.id])])
+  const grads = [[0, 1], [1, 2], [2, 3], [3, 0]]
+  $('[data-radar-defs]', root).innerHTML = grads.map(([a, b], i) => `
+    <linearGradient id="rg-${root.id}-${i}" gradientUnits="userSpaceOnUse" x1="${pts[a][0].toFixed(1)}" y1="${pts[a][1].toFixed(1)}" x2="${pts[b][0].toFixed(1)}" y2="${pts[b][1].toFixed(1)}">
+      <stop offset="0%" stop-color="${cols[a]}"/><stop offset="100%" stop-color="${cols[b]}"/></linearGradient>`).join('')
+  $('[data-radar-quadrants]', root).innerHTML = grads.map(([a, b], i) =>
+    `<polygon points="${cx},${cy} ${pts[a][0].toFixed(1)},${pts[a][1].toFixed(1)} ${pts[b][0].toFixed(1)},${pts[b][1].toFixed(1)}" fill="url(#rg-${root.id}-${i})"/>`).join('')
+  $('[data-radar-edges]', root).innerHTML = grads.map(([a, b], i) =>
+    `<line x1="${pts[a][0].toFixed(1)}" y1="${pts[a][1].toFixed(1)}" x2="${pts[b][0].toFixed(1)}" y2="${pts[b][1].toFixed(1)}" stroke="url(#rg-${root.id}-${i})"/>`).join('')
+  $('[data-radar-points]', root).innerHTML = pts.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="${cols[i]}"/>`).join('')
+  EIXOS.forEach((e, i) => {
+    const t = $(`[data-radar-value="${e.id}"]`, root)
+    t.textContent = scores[e.id] === null ? '—' : String(scores[e.id])
+    t.setAttribute('fill', scores[e.id] === null ? '#F6F2E7' : cols[i])
+  })
+}
+
+function blocoCompleto(ids, grupo) {
+  return ids.every((id) => {
+    const v = state.answers[grupo][id]
+    return v !== null && v !== undefined && v !== ''
+  })
+}
+
+const PRECO_IDS = PERGUNTAS.filter((p) => p.grupo === 'likert' && p.id.startsWith('P')).map((p) => p.id)
+const PAPEL_IDS = PERGUNTAS.filter((p) => p.grupo === 'categoricas').map((p) => p.id)
+
+// opts: { complete, revealed, animate, answers }
+function renderReport(root, r, opts = {}) {
+  const a = opts.answers || normalizar(state.answers).answers
+  const complete = opts.complete ?? OBRIGATORIAS.every(hasAnswer)
+  const revealed = opts.revealed ?? state.revealed
+  const animate = opts.animate ?? true
+
+  // Identidade
+  const ident = {
+    nome: (a.lead.nome || '').trim(),
+    papel: a.lead.papel ? QUESTOES.lead.papel.opcoes[a.lead.papel] : '',
+    foco: a.lead.foco ? QUESTOES.lead.foco.opcoes[a.lead.foco] : '',
+    agenda: a.roteamento.agenda ? QUESTOES.roteamento.agenda.opcoes[a.roteamento.agenda] : '',
+  }
+  for (const [k, v] of Object.entries(ident)) {
+    const el = $(`[data-ident-key="${k}"] .attr__val`, root)
+    if (!el) continue
+    if (v) {
+      if (el.textContent !== v) { el.textContent = v; el.removeAttribute('data-empty'); if (animate) flash(el) }
+    } else if (el.textContent !== '—') { el.textContent = '—'; el.setAttribute('data-empty', '') }
+  }
+
+  // Radar + barras
+  renderRadar(root, r.scores)
+  for (const e of EIXOS) {
+    const row = $(`[data-score="${e.id}"]`, root)
+    const s = r.scores[e.id]
+    tierClass(row, faixa(s))
+    $('.score__fill', row).style.width = `${s ?? 0}%`
+    const valEl = $('[data-value]', row)
+    const txt = s === null ? '—' : String(s)
+    if (valEl.textContent !== txt) { valEl.textContent = txt; if (animate && s !== null) flash(valEl) }
+    const note = $('[data-note]', row)
+    const n = complete ? notaEixo(e.id, r) : null
+    note.textContent = n || 'Preenche conforme você responde.'
+    note.classList.toggle('is-pending', !n)
+  }
+
+  // Selos
+  const seloPreco = blocoCompleto(PRECO_IDS, 'likert') ? SELO_PRECO[r.selos.selo_preco] : null
+  const seloPapel = blocoCompleto(PAPEL_IDS, 'categoricas') ? SELO_PAPEL[r.selos.selo_papel] : null
+  for (const [k, s] of [['preco', seloPreco], ['papel', seloPapel]]) {
+    const el = $(`[data-selo="${k}"]`, root)
+    el.classList.toggle('is-pending', !s)
+    el.classList.remove('is-top', 'is-mid', 'is-low')
+    if (s) el.classList.add(`is-${s.tom}`)
+    $('.selo__val', el).textContent = s ? s.label : '—'
+  }
+
+  // Condecorações
+  let ganhas = 0
+  const novas = []
+  for (const b of BADGES) {
+    const ok = !!b.when(a, r)
+    const el = $(`[data-badge="${b.id}"]`, root)
+    el.classList.toggle('locked', !ok)
+    if (ok) {
+      ganhas++
+      if (opts.trackUnlocks && !state.unlocked.has(b.id)) { state.unlocked.add(b.id); novas.push(b); if (animate) { el.classList.remove('is-revealing'); void el.offsetWidth; el.classList.add('is-revealing') } }
+    }
+  }
+  $('[data-badges-meta]', root).textContent = `${ganhas} conquistada${ganhas === 1 ? '' : 's'}`
+  $('[data-badges-count]', root).textContent = `${ganhas} / ${BADGES.length}`
+
+  // Persona
+  const personaEl = $('[data-persona]', root)
+  const flavorEl = $('[data-persona-flavor]', root)
+  if (complete) {
+    if (personaEl.textContent !== r.persona_titulo) {
+      personaEl.textContent = r.persona_titulo
+      personaEl.classList.remove('is-pending')
+      if (animate) { personaEl.classList.remove('is-revealing'); void personaEl.offsetWidth; personaEl.classList.add('is-revealing') }
+    }
+    flavorEl.textContent = PERSONA_FLAVOR[r.persona_sugerida] || ''
+  } else {
+    personaEl.textContent = '???'
+    personaEl.classList.add('is-pending')
+    flavorEl.textContent = 'Sua persona aparece aqui quando você terminar de responder.'
+  }
+
+  // SWOT + oferta (gated)
+  root.classList.toggle('is-revealed', revealed)
+  if (revealed) {
+    const swot = swotDeterministico(r, a)
+    for (const k of Object.keys(SWOT_TITULO)) {
+      $(`[data-swot="${k}"]`, root).innerHTML = (swot[k].length ? swot[k] : ['—']).map((t) => `<li>${esc(t)}</li>`).join('')
+    }
+    const o = r.oferta
+    $('[data-offer]', root).innerHTML = `
+      <div class="offer__main">
+        <span class="offer__kicker">Oferta principal</span>
+        <div class="offer__title">${esc(OFERTA_TITULOS[o.principal])}</div>
+        <p class="offer__copy">${esc(o.copy_gancho)}</p>
+        ${o.complementar ? `<span class="offer__chip">+ ${esc(OFERTA_TITULOS[o.complementar])}</span>` : ''}
+        ${o.trafego_proibido_passo_1 ? '<span class="offer__chip offer__chip--warn">Tráfego não é o passo 1</span>' : ''}
+      </div>
+      <div class="offer__grid">
+        <div class="offer__block"><span class="offer__kicker">O que não fazer agora</span><p>${esc(o.o_que_nao_fazer_agora)}</p></div>
+        <div class="offer__block"><span class="offer__kicker">Fase 2</span><p>${esc(o.fase_2)}</p></div>
+      </div>
+      <div class="offer__numbers"><span class="offer__kicker">Os 3 números que eu vou te pedir</span><ol>${NUMEROS_PEDIR.map((n) => `<li>${esc(n)}</li>`).join('')}</ol></div>`
+    $$('[data-action="copy"],[data-action="print"]', root).forEach((b) => { b.disabled = false; b.removeAttribute('data-tooltip') })
+    $('[data-footer-note]', root).textContent = `Pré-laudo gerado pelo motor. O laudo comentado sai no WhatsApp${state.lead ? '' : ' após o cadastro'}.`
+  }
+
+  return { ganhas, novas }
+}
+
+function flash(el) {
+  if (reduceMotion) return
+  el.classList.remove('is-flashing'); void el.offsetWidth; el.classList.add('is-flashing')
+}
+
+// Atualização ao vivo --------------------------------------------------------
+
+let lastScores = null
+function liveUpdate() {
+  const root = $('#laudo')
+  const r = currentResult()
+  const before = lastScores
+  const { novas } = renderReport(root, r, { trackUnlocks: true })
+  lastScores = { ...r.scores }
+  novas.forEach(queueToast)
+  if (before) {
+    const changed = EIXOS.some((e) => before[e.id] !== r.scores[e.id])
+    if (changed || novas.length) bumpTab()
+  }
+  updateProgress()
+  save()
+}
+
+function updateProgress() {
+  const done = OBRIGATORIAS.filter(hasAnswer).length
+  const pct = Math.round((done / OBRIGATORIAS.length) * 100)
+  const fill = $('[data-progress-fill]')
+  if (fill) fill.style.width = `${state.revealed ? 100 : Math.min(pct, 96)}%`
+}
+
+// Análise + revelação --------------------------------------------------------
+
+function startAnalysis(stepIndex) {
+  const root = $('#laudo')
+  const pill = $('[data-analyzing]', root)
+  pill.hidden = false
+  root.classList.add('is-analyzing')
+  let i = 0
+  const sub = $('[data-analyzing-sub]', root)
+  const rot = setInterval(() => { i = (i + 1) % ANALISE_FRASES.length; sub.textContent = ANALISE_FRASES[i] }, 900)
+  schedule(() => { showTyping() }, 400)
+  setTimeout(() => {
+    clearInterval(rot)
+    pill.hidden = true
+    root.classList.remove('is-analyzing')
+    state.revealed = true
+    hideTyping()
+    liveUpdate()
+    const r = currentResult()
+    appendBot(`Saiu, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.${r.oferta.trafego_proibido_passo_1 ? ' Tráfego não é o passo 1 aqui.' : ''}`, stepIndex + 1)
+    schedule(() => {
+      appendBot('O laudo completo, com o SWOT comentado e a mensagem que eu te mandaria, vai pro seu WhatsApp. Enquanto isso o card já é seu: copia o resumo ou baixa o PDF.<span data-onboarding-result></span>', stepIndex + 2)
+      $('[data-progress-fill]').style.width = '100%'
+      if (CONFIG.whatsapp) {
+        schedule(() => appendCta(stepIndex + 3), 900)
+      }
+    }, 1400)
+  }, reduceMotion ? 600 : 3600)
+}
+
+function appendCta(stepIndex) {
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--question'
+  li.dataset.stepIndex = stepIndex
+  const r = currentResult()
+  const msg = encodeURIComponent(`Oi ${CONFIG.guia}, fiz o Raio-X. Persona: ${r.persona_titulo}. Oferta: ${OFERTA_TITULOS[r.oferta.principal]}. Quero o laudo completo.`)
+  li.innerHTML = `<article class="q"><nav class="q__nav q__nav--end"><a class="q__btn q__btn--primary" href="https://wa.me/${CONFIG.whatsapp}?text=${msg}" target="_blank" rel="noopener">Receber laudo no WhatsApp <span aria-hidden="true">→</span></a></nav></article>`
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+}
+
+async function enviarParaApi() {
+  try {
+    await fetch('/api/avaliar', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(state.answers) })
+  } catch (_) { /* motor roda no cliente; API é opcional */ }
+}
+
+// Toast + tab badge ----------------------------------------------------------
+
+const toastQueue = []
+let toastOn = false
+function queueToast(b) { toastQueue.push(b); if (!toastOn) nextToast() }
+function nextToast() {
+  const b = toastQueue.shift()
+  const t = $('[data-toast]')
+  if (!b || !t) { toastOn = false; return }
+  toastOn = true
+  t.innerHTML = `<span class="toast__icon" aria-hidden="true">${b.icon}</span><div class="toast__body"><span class="toast__title">Condecoração: ${esc(b.nome)}</span><span class="toast__blurb">${esc(b.blurb)}</span></div>`
+  t.hidden = false
+  requestAnimationFrame(() => t.classList.add('is-visible'))
+  setTimeout(() => { t.classList.remove('is-visible'); setTimeout(() => { t.hidden = true; nextToast() }, 420) }, 3800)
+}
+
+function bumpTab() {
+  const tab = $('[data-tab="report"]')
+  if (!tab || tab.classList.contains('is-active')) return
+  state.bumps++
+  const badge = $('[data-tab-badge]')
+  badge.textContent = String(state.bumps)
+  badge.hidden = false
+  tab.classList.remove('is-flashing'); void tab.offsetWidth; tab.classList.add('is-flashing')
+}
+
+function nudgeReport() {
+  const card = $('#laudo')
+  card.classList.remove('is-nudge'); void card.offsetWidth; card.classList.add('is-nudge')
+  const tab = $('[data-tab="report"]')
+  if (tab && !tab.classList.contains('is-active')) tab.classList.add('is-onboarding')
+}
+
+function setupTabs() {
+  $$('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
+    const which = tab.dataset.tab
+    $$('[data-tab]').forEach((t) => { t.classList.toggle('is-active', t === tab); t.setAttribute('aria-selected', t === tab) })
+    $$('[data-pane]').forEach((p) => p.classList.toggle('is-active', p.dataset.pane === which))
+    if (which === 'report') { state.bumps = 0; const b = $('[data-tab-badge]'); b.hidden = true; tab.classList.remove('is-onboarding') }
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
+  }))
+}
+
+// Ações do laudo -------------------------------------------------------------
+
+function setupActions() {
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]')
+    if (!btn) return
+    const act = btn.dataset.action
+    if (act === 'start') { setView('flow'); if (state.cursor === 0) runFrom(0, true) }
+    if (act === 'reset') { if (confirm('Apagar as respostas e começar de novo?')) reset() }
+    if (act === 'print') window.print()
+    if (act === 'copy') {
+      const r = currentResult()
+      const txt = [
+        `${CONFIG.marca} — ${(state.answers.lead.nome || '').trim()}`,
+        `Persona: ${r.persona_titulo}`,
+        ...EIXOS.map((x) => `${x.longo}: ${r.scores[x.id] ?? '—'}`),
+        `Preço: ${SELO_PRECO[r.selos.selo_preco].label} · Quem vende: ${SELO_PAPEL[r.selos.selo_papel].label}`,
+        `Oferta principal: ${OFERTA_TITULOS[r.oferta.principal]}${r.oferta.complementar ? ` + ${OFERTA_TITULOS[r.oferta.complementar]}` : ''}`,
+        r.oferta.trafego_proibido_passo_1 ? 'Tráfego não é o passo 1.' : '',
+      ].filter(Boolean).join('\n')
+      try { await navigator.clipboard.writeText(txt); toastSimple('Resumo copiado.') } catch (_) { toastSimple('Não deu pra copiar. Seleciona o card e copia.') }
+    }
+  })
+}
+
+function toastSimple(msg) {
+  const t = $('[data-toast]')
+  t.innerHTML = `<div class="toast__body"><span class="toast__title">${esc(msg)}</span></div>`
+  t.hidden = false
+  requestAnimationFrame(() => t.classList.add('is-visible'))
+  setTimeout(() => { t.classList.remove('is-visible'); setTimeout(() => { t.hidden = true }, 420) }, 2200)
+}
+
+// Tooltip clamp dentro do laudo -----------------------------------------------
+function setupTooltips() {
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('[data-tooltip]')
+    if (!el) return
+    const card = el.closest('.fsm-report')
+    if (!card) return
+    const r = el.getBoundingClientRect(), c = card.getBoundingClientRect()
+    const mid = r.left + r.width / 2
+    const half = 120
+    let off = 0
+    if (mid - half < c.left + 8) off = c.left + 8 - (mid - half)
+    if (mid + half > c.right - 8) off = c.right - 8 - (mid + half)
+    el.style.setProperty('--tt-offset', `${off}px`)
+  })
+}
+
+// Preview da intro (fixture da Camila) ---------------------------------------
+
+async function renderPreview() {
+  const root = $('#laudo-preview')
+  if (!root) return
+  root.innerHTML = reportTemplate()
+  try {
+    const fixture = window.__RAIOX_FIXTURE__ || await (await fetch('../lib/exemplo.secretaria-r500.json')).json()
+    const r = avaliar(fixture)
+    renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers })
+    $('[data-footer-note]', root).textContent = 'Exemplo fictício. O seu sai com as suas respostas.'
+    $$('[data-action]', root).forEach((b) => { b.disabled = true; b.removeAttribute('data-tooltip') })
+  } catch (_) {
+    renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio() })
+  }
+}
+
+// Restaurar sessão ------------------------------------------------------------
+
+function restore() {
+  // Reconstrói o chat a partir das respostas já dadas, sem cascata.
+  const stack = stackEl()
+  stack.innerHTML = ''
+  for (let i = 0; i < state.cursor && i < STEPS.length; i++) {
+    const s = STEPS[i]
+    if (s.type === 'message') {
+      const html = s.fn ? s.fn(getAnswer(s.after), state.answers, currentResult()) : s.html
+      if (html) { appendBot(html, i) }
+    } else if (s.type === 'question') {
+      if (hasAnswer(s) || s.opcional) appendUser(s, i)
+    } else if (s.type === 'lead-form' && state.lead) {
+      const li = document.createElement('li'); li.className = 'bubble bubble--user'; li.dataset.stepIndex = i
+      li.innerHTML = `<span class="bubble__text">WhatsApp: ${esc(fmtPhone(state.lead.whatsapp))}</span>`; stack.appendChild(li); li.classList.add('is-in')
+    }
+  }
+  $$('.bubble').forEach((b) => b.classList.add('is-in'))
+  if (state.revealed) {
+    const r = currentResult()
+    appendBot(`Seu laudo está aqui, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.`, STEPS.length + 1)
+  } else if (state.cursor < STEPS.length) {
+    runFrom(state.cursor, false)
+  }
+}
+
+// Init ------------------------------------------------------------------------
+
+function init() {
+  const had = load()
+  $('#laudo').innerHTML = reportTemplate()
+  setupTabs()
+  setupActions()
+  setupTooltips()
+  renderPreview()
+  const r = currentResult()
+  renderReport($('#laudo'), r, { animate: false, trackUnlocks: true })
+  lastScores = { ...r.scores }
+  updateProgress()
+  if (had && state.view === 'flow') { setView('flow'); restore() } else setView('intro')
+}
+
+document.addEventListener('DOMContentLoaded', init)
+
+</script>
+</body>
+</html>

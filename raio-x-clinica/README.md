@@ -178,3 +178,18 @@ Se o quiz precisar caber no intervalo da dona (~26 toques), use só os IDs em `V
 Segunda mensagem no WhatsApp pede 3 números (avaliações/semana · % que fecha em 7 dias · ticket médio do último mês). Com isso se decide IA avulsa vs. consultoria vs. completo sem reunião.
 
 Não deixe o front calcular média na mão. Um P2 = 1 tem que entrar com o peso de `PESOS.preco.P2`.
+
+---
+
+## App: chat + laudo ao vivo (`app/`)
+
+A cara do quiz. Chat à esquerda com uma pergunta por vez; laudo escuro à direita preenchido
+em tempo real (radar, barras, selos, condecorações). Persona sai ao fim das obrigatórias;
+SWOT e oferta liberam depois do WhatsApp. Motor roda no navegador.
+
+```sh
+npm run dev              # http://127.0.0.1:8787/app/
+node app/build.mjs       # arquivo único em app/dist/raio-x.html
+```
+
+Detalhes em `app/README.md`. A pasta `ui/` é o protótipo anterior só do card de resultado.
