@@ -1,13 +1,17 @@
 // Raio-X da Clínica: chat guiado + laudo preenchido ao vivo.
 // O motor (lib/score.js) calcula. Este arquivo só conduz e desenha.
 
-import { avaliar, normalizar } from '../../lib/score.js'
+import { avaliar, normalizar, validarLaudo } from '../../lib/score.js'
 import { QUESTOES, answersVazio } from '../../lib/questions.js'
 import {
   CONFIG, SECOES, LIKERT_OPCOES, EIXOS, faixa, corFaixa,
   PERGUNTAS, OBRIGATORIAS, MENSAGENS_INTRO, MENSAGENS_DEPOIS, MENSAGENS_TRANSICAO_LEAD, ANALISE_FRASES,
   BADGES, PERSONA_FLAVOR, OFERTA_TITULOS, SELO_PRECO, SELO_PAPEL, notaEixo, swotDeterministico, NUMEROS_PEDIR,
+  mensagemTempo, MENSAGEM_LINK, NOTA_RODAPE,
 } from './flow.js'
+
+// Ponto de encontro com módulos opcionais (stories.js registra window.__raiox.gerarStories).
+window.__raiox = window.__raiox || { gerarStories: null }
 
 // ---------------------------------------------------------------------------
 // Estado
@@ -22,17 +26,26 @@ const state = {
   revealed: false,
   unlocked: new Set(),
   bumps: 0,
+  auto: new Set(), // ids de perguntas preenchidas automaticamente (condicionais)
+  inicio: null, // timestamp do "Começar"
+  duracao_s: null, // segundos até o laudo sair
+  laudo: null, // laudo comentado vindo de POST /api/laudo (ou null = determinístico)
+  link: null, // URL pública do laudo salvo (POST /api/salvar)
+  viewMode: false, // true em /l/:id — só leitura, nada vai pro localStorage
 }
 
 const $ = (sel, root = document) => root.querySelector(sel)
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)]
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+const esperar = (ms) => new Promise((res) => setTimeout(res, ms))
 
 function save() {
+  if (state.viewMode) return
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       view: state.view, cursor: state.cursor, answers: state.answers, lead: state.lead, revealed: state.revealed, unlocked: [...state.unlocked],
+      auto: [...state.auto], inicio: state.inicio, duracao_s: state.duracao_s, laudo: state.laudo, link: state.link,
     }))
   } catch (_) {}
 }
@@ -49,6 +62,11 @@ function load() {
     state.lead = s.lead || null
     state.revealed = !!s.revealed
     state.unlocked = new Set(s.unlocked || [])
+    state.auto = new Set(s.auto || [])
+    state.inicio = s.inicio || null
+    state.duracao_s = s.duracao_s ?? null
+    state.laudo = s.laudo && typeof s.laudo === 'object' ? s.laudo : null
+    state.link = typeof s.link === 'string' ? s.link : null
     return true
   } catch (_) { return false }
 }
@@ -75,9 +93,16 @@ function buildSteps() {
   return steps
 }
 const STEPS = buildSteps()
+const LEAD_INDEX = STEPS.findIndex((s) => s.type === 'lead-form')
 
 function getAnswer(p) { return state.answers[p.grupo][p.id] }
 function setAnswer(p, v) { state.answers[p.grupo][p.id] = v }
+function limparAnswer(p) { setAnswer(p, p.tipo === 'multi' ? [] : p.tipo === 'texto' ? '' : null) }
+
+// Condicionais: prompt pode ser função das respostas; pular() decide se a pergunta aparece.
+function promptDe(p) { return typeof p.prompt === 'function' ? p.prompt(state.answers) : p.prompt }
+function estaPulada(p) { return typeof p.pular === 'function' && !!p.pular(state.answers) }
+function valorPadrao(p) { return typeof p.preencher === 'function' ? p.preencher(state.answers) : p.padrao }
 function hasAnswer(p) {
   const v = getAnswer(p)
   if (Array.isArray(v)) return v.length > 0
@@ -165,6 +190,8 @@ function appendQuestion(step, stepIndex) {
   li.className = 'bubble bubble--question'
   li.dataset.stepIndex = stepIndex
   li.dataset.active = 'question'
+  li.dataset.qid = step.id
+  li.dataset.tipo = step.tipo
 
   const current = getAnswer(step)
   let body = ''
@@ -175,8 +202,9 @@ function appendQuestion(step, stepIndex) {
       <button type="button" class="q__option" data-value="${o.valor}" aria-pressed="${current === o.valor}"><span class="q__scale">${o.valor}</span>${esc(o.label)}</button>`).join('')}</div>`
   } else {
     const sel = Array.isArray(current) ? current : current ? [current] : []
-    body = `<div class="q__options" role="group">${Object.entries(step.opcoes).map(([k, label]) => `
-      <button type="button" class="q__option" data-value="${esc(k)}" aria-pressed="${sel.includes(k)}">${esc(label)}</button>`).join('')}</div>`
+    // <kbd> = tecla que seleciona a opção (1–9). Escondido em toque (CSS).
+    body = `<div class="q__options" role="group">${Object.entries(step.opcoes).map(([k, label], i) => `
+      <button type="button" class="q__option" data-value="${esc(k)}" aria-pressed="${sel.includes(k)}">${i < 9 ? `<kbd class="q__key" aria-hidden="true">${i + 1}</kbd>` : ''}${esc(label)}</button>`).join('')}</div>`
   }
 
   const precisaBotao = step.tipo === 'texto' || step.tipo === 'multi'
@@ -187,7 +215,7 @@ function appendQuestion(step, stepIndex) {
 
   li.innerHTML = `<article class="q">
       <span class="q__section">${esc(SECOES[step.secao] || step.secao)}</span>
-      <p class="q__prompt">${interpolar(esc(step.prompt))}</p>
+      <p class="q__prompt">${interpolar(esc(promptDe(step)))}</p>
       ${body}${nav}
     </article>`
 
@@ -275,7 +303,7 @@ function appendLeadCard(stepIndex) {
     li.dataset.active = ''
     li.querySelectorAll('input,button').forEach((el) => { el.disabled = true })
     save()
-    enviarParaApi()
+    enviarLead()
     startAnalysis(stepIndex)
   })
   stackEl().appendChild(li)
@@ -312,6 +340,13 @@ function runFrom(cursor, first = true) {
     }, first ? TIMING.afterUser : TIMING.pause)
     return
   }
+  // Pergunta condicional que não se aplica: grava o padrão e segue, sem card nem balão.
+  if (step.type === 'question' && estaPulada(step)) {
+    setAnswer(step, valorPadrao(step))
+    state.auto.add(step.id)
+    liveUpdate()
+    return runFrom(cursor + 1, first)
+  }
   schedule(() => {
     if (step.type === 'question') appendQuestion(step, cursor)
     else if (step.type === 'lead-form') appendLeadCard(cursor)
@@ -323,6 +358,7 @@ function advance(stepIndex) {
   const step = STEPS[stepIndex]
   const li = $(`[data-step-index="${stepIndex}"][data-active]`)
   if (li) li.remove()
+  state.auto.delete(step.id)
   appendUser(step, stepIndex)
   liveUpdate()
   runFrom(stepIndex + 1, true)
@@ -332,6 +368,15 @@ function goBack(stepIndex) {
   clearTimeout(timer)
   hideTyping()
   $$('[data-step-index]').forEach((el) => { if (Number(el.dataset.stepIndex) >= stepIndex) el.remove() })
+  // Auto-preenchidas dali pra frente voltam a null: a condição vai ser reavaliada.
+  for (let i = stepIndex; i < STEPS.length; i++) {
+    const s = STEPS[i]
+    if (s.type === 'question' && state.auto.has(s.id)) { limparAnswer(s); state.auto.delete(s.id) }
+  }
+  // Editou resposta: o laudo comentado e o link deixam de bater com as respostas.
+  state.laudo = null
+  state.link = null
+  save()
   runFrom(stepIndex, false)
 }
 
@@ -461,11 +506,24 @@ export function reportTemplate() {
     </div>
   </section>
 
+  <section class="report__section report__section--gated report__section--msg" data-gated data-msg hidden>
+    <div class="section-head"><span class="section-num">05</span><h3>Mensagem</h3><span class="section-meta">o que eu te mandaria</span></div>
+    <div class="msg">
+      <blockquote class="msg__text" data-msg-text></blockquote>
+      <div class="msg__foot">
+        <button type="button" class="btn-act" data-action="copy-msg">Copiar mensagem</button>
+        <p class="msg__share" data-msg-share hidden></p>
+      </div>
+    </div>
+  </section>
+
   <footer class="report__footer">
     <span class="footer-note" data-footer-note></span>
     <div class="report__actions">
       <button type="button" class="btn-act btn-act--primary" data-action="copy" disabled data-tooltip="Libera quando o laudo sair.">Copiar resumo</button>
+      <button type="button" class="btn-act" data-action="stories" hidden>Stories</button>
       <button type="button" class="btn-act" data-action="print" disabled data-tooltip="Libera quando o laudo sair.">Baixar PDF</button>
+      <button type="button" class="btn-act" data-action="copy-link" hidden>Copiar link</button>
     </div>
   </footer>`
 }
@@ -513,12 +571,17 @@ function blocoCompleto(ids, grupo) {
 const PRECO_IDS = PERGUNTAS.filter((p) => p.grupo === 'likert' && p.id.startsWith('P')).map((p) => p.id)
 const PAPEL_IDS = PERGUNTAS.filter((p) => p.grupo === 'categoricas').map((p) => p.id)
 
-// opts: { complete, revealed, animate, answers }
+// Laudo comentado (LLM) só entra onde o texto bate com o formato esperado. Fora disso, determinístico.
+function textoOk(t) { return typeof t === 'string' && t.trim().length > 0 }
+function listaOk(l) { return Array.isArray(l) && l.length > 0 && l.every(textoOk) }
+
+// opts: { complete, revealed, animate, answers, laudo, trackUnlocks }
 export function renderReport(root, r, opts = {}) {
   const a = opts.answers || normalizar(state.answers).answers
-  const complete = opts.complete ?? OBRIGATORIAS.every(hasAnswer)
+  const complete = opts.complete ?? (state.viewMode || OBRIGATORIAS.every(hasAnswer))
   const revealed = opts.revealed ?? state.revealed
   const animate = opts.animate ?? true
+  const laudo = 'laudo' in opts ? opts.laudo : state.laudo
 
   // Identidade
   const ident = {
@@ -546,7 +609,8 @@ export function renderReport(root, r, opts = {}) {
     const txt = s === null ? '—' : String(s)
     if (valEl.textContent !== txt) { valEl.textContent = txt; if (animate && s !== null) flash(valEl) }
     const note = $('[data-note]', row)
-    const n = complete ? notaEixo(e.id, r) : null
+    const comentada = revealed && laudo?.scores_comentados?.[e.id]?.texto
+    const n = complete ? (textoOk(comentada) ? comentada.trim() : notaEixo(e.id, r)) : null
     note.textContent = n || 'Preenche conforme você responde.'
     note.classList.toggle('is-pending', !n)
   }
@@ -586,7 +650,8 @@ export function renderReport(root, r, opts = {}) {
       personaEl.classList.remove('is-pending')
       if (animate) { personaEl.classList.remove('is-revealing'); void personaEl.offsetWidth; personaEl.classList.add('is-revealing') }
     }
-    flavorEl.textContent = PERSONA_FLAVOR[r.persona_sugerida] || ''
+    const sub = revealed && laudo?.persona?.subtitulo
+    flavorEl.textContent = textoOk(sub) ? sub.trim() : (PERSONA_FLAVOR[r.persona_sugerida] || '')
   } else {
     personaEl.textContent = '???'
     personaEl.classList.add('is-pending')
@@ -595,17 +660,21 @@ export function renderReport(root, r, opts = {}) {
 
   // SWOT + oferta (gated)
   root.classList.toggle('is-revealed', revealed)
+  root.classList.toggle('has-laudo', revealed && !!laudo)
   if (revealed) {
-    const swot = swotDeterministico(r, a)
+    const det = swotDeterministico(r, a)
     for (const k of Object.keys(SWOT_TITULO)) {
-      $(`[data-swot="${k}"]`, root).innerHTML = (swot[k].length ? swot[k] : ['—']).map((t) => `<li>${esc(t)}</li>`).join('')
+      const lista = listaOk(laudo?.swot?.[k]) ? laudo.swot[k] : det[k]
+      $(`[data-swot="${k}"]`, root).innerHTML = (lista.length ? lista : ['—']).map((t) => `<li>${esc(t)}</li>`).join('')
     }
     const o = r.oferta
+    const porQue = laudo?.oferta?.por_que
     $('[data-offer]', root).innerHTML = `
       <div class="offer__main">
         <span class="offer__kicker">Oferta principal</span>
         <div class="offer__title">${esc(OFERTA_TITULOS[o.principal])}</div>
         <p class="offer__copy">${esc(o.copy_gancho)}</p>
+        ${textoOk(porQue) ? `<p class="offer__why" data-offer-why><span class="offer__kicker">Por quê</span>${esc(porQue.trim())}</p>` : ''}
         ${o.complementar ? `<span class="offer__chip">+ ${esc(OFERTA_TITULOS[o.complementar])}</span>` : ''}
         ${o.trafego_proibido_passo_1 ? '<span class="offer__chip offer__chip--warn">Tráfego não é o passo 1</span>' : ''}
       </div>
@@ -614,11 +683,36 @@ export function renderReport(root, r, opts = {}) {
         <div class="offer__block"><span class="offer__kicker">Fase 2</span><p>${esc(o.fase_2)}</p></div>
       </div>
       <div class="offer__numbers"><span class="offer__kicker">Os 3 números que eu vou te pedir</span><ol>${NUMEROS_PEDIR.map((n) => `<li>${esc(n)}</li>`).join('')}</ol></div>`
+
+    // 05 Mensagem: só existe com laudo comentado.
+    const msgSec = $('[data-msg]', root)
+    const msg = laudo?.whatsapp_msg_1
+    if (textoOk(msg)) {
+      msgSec.hidden = false
+      $('[data-msg-text]', root).textContent = msg.trim()
+      const share = $('[data-msg-share]', root)
+      share.hidden = !textoOk(laudo?.frase_share)
+      share.textContent = textoOk(laudo?.frase_share) ? laudo.frase_share.trim() : ''
+    } else {
+      msgSec.hidden = true
+    }
+
     $$('[data-action="copy"],[data-action="print"]', root).forEach((b) => { b.disabled = false; b.removeAttribute('data-tooltip') })
-    $('[data-footer-note]', root).textContent = `Pré-laudo gerado pelo motor. O laudo comentado sai no WhatsApp${state.lead ? '' : ' após o cadastro'}.`
+    $('[data-footer-note]', root).textContent = laudo ? NOTA_RODAPE.comLaudo : NOTA_RODAPE.semLaudo
+  } else {
+    $('[data-msg]', root).hidden = true
   }
+  atualizarAcoes(root, { revealed, link: 'link' in opts ? opts.link : state.link })
 
   return { ganhas, novas }
+}
+
+// Botões do rodapé que dependem de contexto: link salvo e gerador de Stories (módulo opcional).
+function atualizarAcoes(root, { revealed, link }) {
+  const copyLink = $('[data-action="copy-link"]', root)
+  if (copyLink) copyLink.hidden = !(revealed && link)
+  const stories = $('[data-action="stories"]', root)
+  if (stories) stories.hidden = !(revealed && !state.viewMode && typeof window.__raiox?.gerarStories === 'function')
 }
 
 function flash(el) {
@@ -653,7 +747,12 @@ function updateProgress() {
 
 // Análise + revelação --------------------------------------------------------
 
-function startAnalysis(stepIndex) {
+// Fluxo: animação mínima de ~3,5 s em paralelo com POST /api/laudo (até 25 s).
+// Sem backend (501/404/503/rede), o card sai determinístico e o texto avisa.
+const ANALISE_MIN_MS = 3500
+const LAUDO_TIMEOUT_MS = 25000
+
+async function startAnalysis(stepIndex) {
   const root = $('#laudo')
   const pill = $('[data-analyzing]', root)
   pill.hidden = false
@@ -662,23 +761,89 @@ function startAnalysis(stepIndex) {
   const sub = $('[data-analyzing-sub]', root)
   const rot = setInterval(() => { i = (i + 1) % ANALISE_FRASES.length; sub.textContent = ANALISE_FRASES[i] }, 900)
   schedule(() => { showTyping() }, 400)
-  setTimeout(() => {
-    clearInterval(rot)
-    pill.hidden = true
-    root.classList.remove('is-analyzing')
-    state.revealed = true
-    hideTyping()
-    liveUpdate()
-    const r = currentResult()
-    appendBot(`Saiu, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.${r.oferta.trafego_proibido_passo_1 ? ' Tráfego não é o passo 1 aqui.' : ''}`, stepIndex + 1)
-    schedule(() => {
-      appendBot('O laudo completo, com o SWOT comentado e a mensagem que eu te mandaria, vai pro seu WhatsApp. Enquanto isso o card já é seu: copia o resumo ou baixa o PDF.<span data-onboarding-result></span>', stepIndex + 2)
-      $('[data-progress-fill]').style.width = '100%'
-      if (CONFIG.whatsapp) {
-        schedule(() => appendCta(stepIndex + 3), 900)
-      }
-    }, 1400)
-  }, reduceMotion ? 600 : 3600)
+
+  const r0 = currentResult()
+  const [, laudo] = await Promise.all([esperar(reduceMotion ? 600 : ANALISE_MIN_MS), pedirLaudo(r0)])
+  state.laudo = laudo
+
+  clearInterval(rot)
+  pill.hidden = true
+  root.classList.remove('is-analyzing')
+  state.revealed = true
+  if (state.inicio && state.duracao_s === null) state.duracao_s = Math.max(1, Math.round((Date.now() - state.inicio) / 1000))
+  hideTyping()
+  liveUpdate()
+  const r = currentResult()
+  appendBot(`Saiu, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.${r.oferta.trafego_proibido_passo_1 ? ' Tráfego não é o passo 1 aqui.' : ''}`, stepIndex + 1)
+  schedule(() => {
+    const tempo = state.duracao_s !== null ? `<span data-tempo>${esc(mensagemTempo(state.duracao_s))}</span> ` : ''
+    const corpo = laudo
+      ? 'O laudo comentado está no card: SWOT, por quê da oferta e a mensagem que eu te mandaria. Copia o resumo, a mensagem ou baixa o PDF.'
+      : 'O laudo completo, com o SWOT comentado e a mensagem que eu te mandaria, vai pro seu WhatsApp. Enquanto isso o card já é seu: copia o resumo ou baixa o PDF.'
+    appendBot(`${tempo}${corpo}<span data-onboarding-result></span>`, stepIndex + 2)
+    $('[data-progress-fill]').style.width = '100%'
+    if (CONFIG.whatsapp) {
+      schedule(() => appendCta(stepIndex + 3), 900)
+    }
+    salvarLaudo(stepIndex + 4)
+  }, 1400)
+}
+
+function appendLinkBubble(stepIndex) {
+  if (!state.link) return
+  const curto = state.link.replace(/^https?:\/\//, '')
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--bot'
+  li.dataset.stepIndex = stepIndex
+  li.dataset.link = '1'
+  li.innerHTML = `${avatarHtml()}<div class="bubble__text">${esc(MENSAGEM_LINK)} <a href="${esc(state.link)}" target="_blank" rel="noopener" data-link-laudo>${esc(curto)}</a></div>`
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+}
+
+// Backend opcional. Toda falha vira null/silêncio: o motor já rodou no navegador.
+
+async function postJson(url, body, { timeout = 15000 } = {}) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), timeout)
+  try {
+    const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal })
+    if (!res.ok) return null
+    const data = await res.json().catch(() => null)
+    return data && data.ok === true ? data : null
+  } catch (_) {
+    return null
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+// POST /api/lead — fire-and-forget, não bloqueia nada.
+function enviarLead() {
+  if (!state.lead) return
+  postJson('/api/lead', { lead: state.lead, answers: state.answers, origem: 'app' }).catch(() => {})
+}
+
+// POST /api/laudo { answers } → laudo comentado, ou null. Descarta laudo que contradiz o motor.
+async function pedirLaudo(r) {
+  const data = await postJson('/api/laudo', { answers: state.answers }, { timeout: LAUDO_TIMEOUT_MS })
+  const laudo = data?.laudo
+  if (!laudo || typeof laudo !== 'object' || Array.isArray(laudo)) return null
+  const erros = validarLaudo(laudo, r)
+  if (erros.length) { console.warn('laudo descartado:', erros); return null }
+  return laudo
+}
+
+// POST /api/salvar { answers, laudo } → link público. Se falhar, nada aparece.
+async function salvarLaudo(stepIndex) {
+  const data = await postJson('/api/salvar', { answers: state.answers, laudo: state.laudo })
+  if (!data || typeof data.url !== 'string') return
+  state.link = data.url.startsWith('http') ? data.url : location.origin + data.url
+  save()
+  const root = $('#laudo')
+  if (root) atualizarAcoes(root, { revealed: state.revealed, link: state.link })
+  appendLinkBubble(stepIndex)
 }
 
 function appendCta(stepIndex) {
@@ -691,12 +856,6 @@ function appendCta(stepIndex) {
   stackEl().appendChild(li)
   requestAnimationFrame(() => li.classList.add('is-in'))
   scrollTo(li)
-}
-
-async function enviarParaApi() {
-  try {
-    await fetch('/api/avaliar', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(state.answers) })
-  } catch (_) { /* motor roda no cliente; API é opcional */ }
 }
 
 // Toast + tab badge ----------------------------------------------------------
@@ -774,7 +933,10 @@ function setupActions() {
     const btn = e.target.closest('[data-action]')
     if (!btn) return
     const act = btn.dataset.action
-    if (act === 'start') { setView('flow'); if (state.cursor === 0) runFrom(0, true) }
+    if (act === 'start') {
+      setView('flow')
+      if (state.cursor === 0) { if (!state.inicio) { state.inicio = Date.now(); save() } runFrom(0, true) }
+    }
     if (act === 'reset') { if (confirm('Apagar as respostas e começar de novo?')) reset() }
     if (act === 'print') window.print()
     if (act === 'copy') {
@@ -786,8 +948,84 @@ function setupActions() {
         `Preço: ${SELO_PRECO[r.selos.selo_preco].label} · Quem vende: ${SELO_PAPEL[r.selos.selo_papel].label}`,
         `Oferta principal: ${OFERTA_TITULOS[r.oferta.principal]}${r.oferta.complementar ? ` + ${OFERTA_TITULOS[r.oferta.complementar]}` : ''}`,
         r.oferta.trafego_proibido_passo_1 ? 'Tráfego não é o passo 1.' : '',
+        state.link ? `Laudo: ${state.link}` : '',
       ].filter(Boolean).join('\n')
-      try { await navigator.clipboard.writeText(txt); toastSimple('Resumo copiado.') } catch (_) { toastSimple('Não deu pra copiar. Seleciona o card e copia.') }
+      await copiar(txt, 'Resumo copiado.')
+    }
+    if (act === 'copy-msg') {
+      const msg = state.laudo?.whatsapp_msg_1
+      if (textoOk(msg)) await copiar(msg.trim(), 'Mensagem copiada.')
+    }
+    if (act === 'copy-link') {
+      if (state.link) await copiar(state.link, 'Link copiado.')
+    }
+    if (act === 'stories') gerarStories(btn)
+  })
+  // stories.js pode carregar depois do card: quando registrar, o botão aparece.
+  window.addEventListener('raiox:stories-pronto', () => {
+    const root = $('#laudo')
+    if (root) atualizarAcoes(root, { revealed: state.revealed, link: state.link })
+  })
+}
+
+async function copiar(txt, okMsg) {
+  try { await navigator.clipboard.writeText(txt); toastSimple(okMsg) } catch (_) { toastSimple('Não deu pra copiar. Seleciona o texto e copia.') }
+}
+
+function slug(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+// Stories: PNG 1080×1920 gerado por app/scripts/stories.js (contrato window.__raiox.gerarStories).
+async function gerarStories(btn) {
+  const fn = window.__raiox?.gerarStories
+  if (typeof fn !== 'function') return
+  btn.disabled = true
+  try {
+    const resultado = currentResult()
+    const answers = normalizar(state.answers).answers
+    const blob = await fn({ resultado, answers, tema: document.documentElement.dataset.tema || 'mono', marca: CONFIG.marca })
+    if (!(blob instanceof Blob)) throw new Error('stories sem blob')
+    const nome = `raio-x-${slug(state.answers.lead.nome) || 'clinica'}.png`
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = nome
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 4000)
+    toastSimple('Stories gerado.')
+    const file = typeof File === 'function' ? new File([blob], nome, { type: 'image/png' }) : null
+    if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: CONFIG.marca }) } catch (_) { /* usuário cancelou */ }
+    }
+  } catch (_) {
+    toastSimple('Não deu pra gerar o Stories agora.')
+  } finally {
+    btn.disabled = false
+  }
+}
+
+// Teclado: 1–9 escolhe a opção (Likert: a tecla é o valor), Enter = Continuar quando habilitado.
+function setupTeclado() {
+  document.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return
+    const t = e.target
+    const editando = t && (t.matches?.('input, textarea, select, [contenteditable="true"]'))
+    if (editando) return // Enter no campo de texto já avança pelo handler do próprio input
+    const li = $('[data-active="question"]')
+    if (!li) return
+    if (/^[1-9]$/.test(e.key)) {
+      const opts = $$('.q__option', li)
+      const alvo = li.querySelector('.q__options--likert') ? opts.find((b) => b.dataset.value === e.key) : opts[Number(e.key) - 1]
+      if (alvo) { e.preventDefault(); alvo.click() }
+      return
+    }
+    if (e.key === 'Enter') {
+      if (t && t.closest?.('button, a')) return // o próprio botão focado trata o Enter
+      const next = $('[data-next]', li)
+      if (next && !next.disabled) { e.preventDefault(); next.click() }
     }
   })
 }
@@ -827,7 +1065,7 @@ let previewFixture = null
 function redesenhaPreview() {
   const root = $('#laudo-preview')
   if (!root || !previewFixture) return
-  renderReport(root, avaliar(previewFixture), { complete: true, revealed: true, animate: false, answers: normalizar(previewFixture).answers })
+  renderReport(root, avaliar(previewFixture), { complete: true, revealed: true, animate: false, answers: normalizar(previewFixture).answers, laudo: null, link: null })
 }
 
 function ajustarPreview() {
@@ -856,11 +1094,11 @@ async function renderPreview() {
     const r = avaliar(fixture)
     previewFixture = fixture
     root.dataset.pronto = '1'
-    renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers })
+    renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers, laudo: null, link: null })
     $('[data-footer-note]', root).textContent = 'Exemplo fictício. O seu sai com as suas respostas.'
     $$('[data-action]', root).forEach((b) => { b.disabled = true; b.removeAttribute('data-tooltip') })
   } catch (_) {
-    renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio() })
+    renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio(), laudo: null, link: null })
   }
   ajustarPreview()
   if (window.ResizeObserver) new ResizeObserver(ajustarPreview).observe($('[data-preview-frame]'))
@@ -874,12 +1112,14 @@ function restore() {
   // Reconstrói o chat a partir das respostas já dadas, sem cascata.
   const stack = stackEl()
   stack.innerHTML = ''
-  for (let i = 0; i < state.cursor && i < STEPS.length; i++) {
+  const ate = state.lead ? Math.max(state.cursor, LEAD_INDEX + 1) : state.cursor
+  for (let i = 0; i < ate && i < STEPS.length; i++) {
     const s = STEPS[i]
     if (s.type === 'message') {
       const html = s.fn ? s.fn(getAnswer(s.after), state.answers, currentResult()) : s.html
       if (html) { appendBot(html, i) }
     } else if (s.type === 'question') {
+      if (state.auto.has(s.id)) continue // auto-preenchida: não teve balão
       if (hasAnswer(s) || s.opcional) appendUser(s, i)
     } else if (s.type === 'lead-form' && state.lead) {
       const li = document.createElement('li'); li.className = 'bubble bubble--user'; li.dataset.stepIndex = i
@@ -890,19 +1130,72 @@ function restore() {
   if (state.revealed) {
     const r = currentResult()
     appendBot(`Seu laudo está aqui, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.`, STEPS.length + 1)
+    appendLinkBubble(STEPS.length + 2)
+  } else if (state.lead) {
+    // Recarregou no meio da análise: retoma a análise em vez de pedir o WhatsApp de novo.
+    startAnalysis(LEAD_INDEX)
   } else if (state.cursor < STEPS.length) {
     runFrom(state.cursor, false)
   }
 }
 
+// Modo visualização: /l/<id> (servidor) ou ?__ver=<id> (host estático / teste) -----
+
+const ID_LAUDO_RE = /^[a-z0-9]{8,16}$/
+
+function idVisualizacao() {
+  const m = /^\/l\/([a-z0-9]{8,16})$/.exec(location.pathname)
+  if (m) return m[1]
+  const q = new URLSearchParams(location.search).get('__ver')
+  return q && ID_LAUDO_RE.test(q) ? q : null
+}
+
+async function initVisualizacao(id) {
+  state.viewMode = true
+  const card = $('#laudo')
+  card.innerHTML = reportTemplate()
+  card.hidden = true
+  $('[data-laudo-slot]').appendChild(card)
+  setupTemas()
+  setupActions()
+  setupTooltips()
+  const cta = $('[data-laudo-cta]')
+  if (cta) cta.href = /^\/l\//.test(location.pathname) ? '/app/' : location.pathname
+  setView('laudo')
+
+  let data = null
+  try {
+    const res = await fetch(`/api/laudo/${encodeURIComponent(id)}`, { headers: { accept: 'application/json' } })
+    if (res.ok) data = await res.json().catch(() => null)
+  } catch (_) { data = null }
+
+  const status = $('[data-laudo-status]')
+  if (!data || data.ok !== true || !data.answers || typeof data.answers !== 'object') {
+    status.hidden = true
+    $('[data-laudo-empty]').hidden = false
+    return
+  }
+  state.answers = { ...answersVazio(), ...data.answers }
+  state.laudo = data.laudo && typeof data.laudo === 'object' ? data.laudo : null
+  state.revealed = true
+  state.link = location.origin + (/^\/l\//.test(location.pathname) ? location.pathname : `/l/${id}`)
+  renderReport(card, currentResult(), { complete: true, revealed: true, animate: false })
+  status.hidden = true
+  card.hidden = false
+  document.title = `${CONFIG.marca} — ${(state.answers.lead.nome || '').trim() || 'laudo'}`
+}
+
 // Init ------------------------------------------------------------------------
 
 function init() {
+  const idVer = idVisualizacao()
+  if (idVer) { initVisualizacao(idVer); return }
   const had = load()
   $('#laudo').innerHTML = reportTemplate()
   setupTemas()
   setupTabs()
   setupActions()
+  setupTeclado()
   setupTooltips()
   renderPreview()
   const r = currentResult()

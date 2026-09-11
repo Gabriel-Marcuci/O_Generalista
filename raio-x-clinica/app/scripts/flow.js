@@ -68,6 +68,10 @@ export function corFaixa(f, root = document.documentElement) {
 // Perguntas na ordem do chat (versão 8 minutos + bônus)
 // ---------------------------------------------------------------------------
 
+// extra aceita, além de prompt/placeholder/secao/opcional:
+//   prompt(answers) → string        texto que muda conforme respostas anteriores
+//   pular(answers) → boolean        true = não pergunta; grava `padrao` (ou preencher(answers)) e segue
+//   padrao / preencher(answers)     valor gravado quando pulada
 function q(grupo, id, extra = {}) {
   const def = QUESTOES[grupo][id]
   const tipo = extra.tipo || (grupo === 'likert' ? 'likert' : def.tipo === 'multi' ? 'multi' : def.tipo === 'texto' ? 'texto' : 'opcao')
@@ -81,8 +85,15 @@ function q(grupo, id, extra = {}) {
     placeholder: extra.placeholder || '',
     secao: extra.secao || 'perfil',
     opcoes: def.opcoes || null,
+    pular: extra.pular || null,
+    padrao: extra.padrao ?? null,
+    preencher: extra.preencher || null,
   }
 }
+
+// Condicionais do bloco "quem vende".
+const donaFazTudo = (a) => a.categoricas.S1 === 'sou_eu'
+const respondeAutomatico = (a) => a.roteamento.quem_responde_digital === 'automatico'
 
 export const PERGUNTAS = [
   q('lead', 'nome', { prompt: 'Pra começar: como você se chama?', placeholder: 'Ex: Camila', secao: 'perfil' }),
@@ -112,10 +123,17 @@ export const PERGUNTAS = [
   q('likert', 'WA1', { secao: 'whatsapp' }),
   q('likert', 'WA3', { secao: 'whatsapp' }),
 
-  q('categoricas', 'S1', { secao: 'papel' }),
-  q('categoricas', 'S2', { secao: 'papel' }),
-  q('categoricas', 'S3', { secao: 'papel' }),
-  q('categoricas', 'S4', { secao: 'papel' }),
+  q('categoricas', 'S1', {
+    secao: 'papel',
+    prompt: (a) => (respondeAutomatico(a) ? 'Quem configurou a ferramenta que responde hoje foi orientado a fazer o quê?' : QUESTOES.categoricas.S1.texto),
+  }),
+  q('categoricas', 'S2', {
+    secao: 'papel',
+    prompt: (a) => (donaFazTudo(a) ? 'Você consegue conduzir uma conversa de protocolo de ticket alto até o fechamento, sozinha, pelo WhatsApp?' : QUESTOES.categoricas.S2.texto),
+  }),
+  // Se a dona faz tudo, remuneração e faixa não se aplicam: o motor já entende `sou_eu`.
+  q('categoricas', 'S3', { secao: 'papel', pular: donaFazTudo, padrao: 'sou_eu' }),
+  q('categoricas', 'S4', { secao: 'papel', pular: donaFazTudo, padrao: 'sou_eu' }),
   q('categoricas', 'S5', { secao: 'papel' }),
   q('categoricas', 'S6', { secao: 'papel' }),
 
@@ -163,6 +181,18 @@ export const ANALISE_FRASES = [
   'Checando se tráfego cabe agora…',
   'Roteando a oferta…',
 ]
+
+// Tempo real de resposta, medido do "Começar" até o laudo sair. Mínimo 1 minuto.
+export function mensagemTempo(segundos) {
+  const min = Math.max(1, Math.round((segundos || 0) / 60))
+  return `Você levou ${min} minuto${min === 1 ? '' : 's'}.`
+}
+
+export const MENSAGEM_LINK = 'Seu laudo tem um link:'
+export const NOTA_RODAPE = {
+  comLaudo: 'Laudo comentado, gerado das suas respostas. O motor decide; o texto explica.',
+  semLaudo: 'Pré-laudo do motor. O laudo comentado sai no WhatsApp.',
+}
 
 // ---------------------------------------------------------------------------
 // Condecorações (18). when(a, r) recebe answers normalizadas e o resultado do motor.

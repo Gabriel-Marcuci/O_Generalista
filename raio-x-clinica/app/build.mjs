@@ -34,6 +34,7 @@ const css = read('app/styles/app.css')
 
 let html = read('app/index.html')
 html = html.replace(/<link rel="stylesheet" href="styles\/app.css">/, () => `<style>\n${css}\n</style>`)
+html = html.replace(/\s*<!-- Opcional: gerador do PNG de Stories[^\n]*\n\s*<script type="module" src="scripts\/stories.js"><\/script>/, '')
 html = html.replace(
   /<script type="module" src="scripts\/app.js"><\/script>/,
   () => `<script>window.__RAIOX_FIXTURE__ = ${fixture};</script>\n<script>\n${modulos}\n</script>`, // função: evita $$ virar $

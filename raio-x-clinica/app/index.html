@@ -49,6 +49,19 @@
     </div>
   </section>
 
+  <!-- ===== VIEW: LAUDO (só leitura — /l/:id ou ?__ver=:id) ===== -->
+  <section class="view view--laudo" data-view="laudo" aria-hidden="true">
+    <div class="laudo-view" data-laudo-view>
+      <p class="laudo-view__status" data-laudo-status role="status">Abrindo o laudo…</p>
+      <div class="laudo-view__slot" data-laudo-slot></div>
+      <div class="laudo-view__empty" data-laudo-empty hidden>
+        <p class="laudo-view__title">Laudo não encontrado.</p>
+        <p class="laudo-view__sub">O link pode ter vencido ou estar incompleto.</p>
+        <a class="cta" data-laudo-cta href="/app/">Fazer o meu <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== VIEW: FLOW (chat + laudo ao vivo) ===== -->
   <section class="view view--flow" data-view="flow" aria-hidden="true">
     <header class="progress" aria-label="Progresso">
@@ -76,5 +89,7 @@
 </main>
 
 <script type="module" src="scripts/app.js"></script>
+<!-- Opcional: gerador do PNG de Stories. Registra window.__raiox.gerarStories e dispara raiox:stories-pronto. -->
+<script type="module" src="scripts/stories.js"></script>
 </body>
 </html>

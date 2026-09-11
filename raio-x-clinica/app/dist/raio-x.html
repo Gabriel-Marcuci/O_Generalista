@@ -168,9 +168,6 @@
     --ink-2: #C9C4DA;
     --ink-3: #837E93;
     --line: #272235;
-    --field: #17142
-
-2;
     --field: #171422;
     --btn: #F6F4FB;
     --btn-fg: #120E20;
@@ -205,7 +202,19 @@ a { color: inherit; }
 /* ——— Views ——— */
 .view { display: none; }
 body[data-view="intro"] .view--intro,
-body[data-view="flow"] .view--flow { display: block; }
+body[data-view="flow"] .view--flow,
+body[data-view="laudo"] .view--laudo { display: block; }
+
+/* ——— Laudo em modo leitura (/l/:id) ——— */
+.laudo-view { width: min(860px, 100%); margin: 0 auto; padding-block: clamp(8px, 3vw, 32px); }
+.laudo-view__status { margin: 0 0 16px; font-size: var(--step--1); color: var(--ink-3); text-align: center; }
+.laudo-view__status[hidden] { display: none; }
+.laudo-view__slot > .fsm-report[hidden] { display: none; }
+.laudo-view__empty { text-align: center; padding: clamp(40px, 10vw, 96px) 0; }
+.laudo-view__empty[hidden] { display: none; }
+.laudo-view__title { font-family: var(--font-display); font-size: var(--step-2); font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; }
+.laudo-view__sub { margin: 0 0 24px; color: var(--ink-3); }
+.laudo-view__empty .cta { text-decoration: none; }
 
 .site {
   min-height: 100vh;
@@ -463,6 +472,17 @@ body[data-view="flow"] .view--flow { display: block; }
   font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--ink-2);
 }
 .q__option[aria-pressed="true"] .q__scale { background: var(--accent-wash); color: var(--page); }
+/* Tecla que seleciona a opção. Sem cor: só o contorno, no idioma do card. */
+.q__key {
+  flex-shrink: 0; min-width: 18px; height: 18px; padding: 0 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 5px;
+  font-family: var(--font-sans); font-size: 10.5px; font-weight: 600; line-height: 1;
+  color: var(--ink-3); font-variant-numeric: tabular-nums;
+}
+.q__option:hover .q__key { border-color: var(--ink-3); color: var(--ink-2); }
+.q__option[aria-pressed="true"] .q__key { border-color: currentColor; color: var(--page); opacity: .7; }
+@media (hover: none) and (pointer: coarse) { .q__key { display: none; } }
 .q__options--likert { display: grid; grid-template-columns: 1fr 1fr; }
 @media (max-width: 560px) { .q__options--likert { grid-template-columns: 1fr; } }
 .q__input {
@@ -724,6 +744,8 @@ body[data-view="flow"] .view--flow { display: block; }
 .offer__kicker { font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
 .offer__title { font-size: clamp(18px, 2.2vw, 22px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
 .offer__copy { margin: 0; font-size: 14px; line-height: 1.5; opacity: .78; }
+.offer__why { margin: 4px 0 0; font-size: 13px; line-height: 1.5; opacity: .88; display: flex; flex-direction: column; gap: 2px; white-space: pre-line; }
+.offer__why .offer__kicker { opacity: .6; }
 .offer__chip { display: inline-flex; width: fit-content; padding: 4px 10px; border-radius: 999px; background: var(--card); color: var(--accent); font-size: 11px; font-weight: 700; margin-top: 4px; }
 .offer__chip--warn { background: var(--tier-low); color: var(--fg-strong); }
 .offer__grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
@@ -732,6 +754,20 @@ body[data-view="flow"] .view--flow { display: block; }
 .offer__block .offer__kicker, .offer__numbers .offer__kicker { color: var(--accent); opacity: 1; display: block; margin-bottom: 6px; }
 .offer__block p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--fg); opacity: .9; }
 .offer__numbers ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--fg); display: flex; flex-direction: column; gap: 4px; }
+
+/* 05 Mensagem — só com laudo comentado */
+.report__section--msg[hidden] { display: none; }
+.msg { display: flex; flex-direction: column; gap: 12px; }
+.msg__text {
+  margin: 0; padding: 18px 20px;
+  background: var(--surface2); border: 1px solid var(--hairline); border-left: 2px solid var(--accent);
+  border-radius: 10px;
+  font-size: 13.5px; line-height: 1.6; color: var(--fg);
+  white-space: pre-wrap;
+}
+.msg__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.msg__share { margin: 0; font-size: 12px; font-style: italic; color: var(--fg-dim); opacity: .75; max-width: 40em; }
+.msg__share[hidden] { display: none; }
 
 .report__footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--hairline); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
 .footer-note { font-size: 11px; color: var(--fg-dim); opacity: .55; max-width: 32em; }
@@ -747,14 +783,17 @@ body[data-view="flow"] .view--flow { display: block; }
 .btn-act--primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 .btn-act--primary:hover:not(:disabled) { opacity: .86; }
 .btn-act:disabled { opacity: .4; cursor: help; }
+.btn-act[hidden] { display: none; }
+.bubble__text a[data-link-laudo] { font-weight: 600; text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
 
 .reset { align-self: flex-start; margin-top: 12px; font-size: var(--step--2); color: var(--ink-3); text-decoration: underline; }
 
 /* ——— Print: só o laudo ——— */
 @media print {
   body { background: #fff; }
-  .progress, .tabs, .chat, .toast, .reset, .view--intro { display: none !important; }
+  .progress, .tabs, .chat, .toast, .reset, .view--intro, .laudo-view__status, .laudo-view__empty { display: none !important; }
   .layout { display: block; width: 100%; }
+  .laudo-view { width: 100%; padding: 0; }
   .report-col { position: static; max-height: none; overflow: visible; }
   .fsm-report { box-shadow: none; border-radius: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .report__actions { display: none; }
@@ -819,6 +858,19 @@ body[data-view="flow"] .view--flow { display: block; }
         </ul>
         <button type="button" class="cta" data-action="start">Começar o Raio-X <span aria-hidden="true">→</span></button>
         <p class="fineprint">Suas respostas só geram o seu laudo. Nada é compartilhado com terceiros.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW: LAUDO (só leitura — /l/:id ou ?__ver=:id) ===== -->
+  <section class="view view--laudo" data-view="laudo" aria-hidden="true">
+    <div class="laudo-view" data-laudo-view>
+      <p class="laudo-view__status" data-laudo-status role="status">Abrindo o laudo…</p>
+      <div class="laudo-view__slot" data-laudo-slot></div>
+      <div class="laudo-view__empty" data-laudo-empty hidden>
+        <p class="laudo-view__title">Laudo não encontrado.</p>
+        <p class="laudo-view__sub">O link pode ter vencido ou estar incompleto.</p>
+        <a class="cta" data-laudo-cta href="/app/">Fazer o meu <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -1867,6 +1919,10 @@ function corFaixa(f, root = document.documentElement) {
 // Perguntas na ordem do chat (versão 8 minutos + bônus)
 // ---------------------------------------------------------------------------
 
+// extra aceita, além de prompt/placeholder/secao/opcional:
+//   prompt(answers) → string        texto que muda conforme respostas anteriores
+//   pular(answers) → boolean        true = não pergunta; grava `padrao` (ou preencher(answers)) e segue
+//   padrao / preencher(answers)     valor gravado quando pulada
 function q(grupo, id, extra = {}) {
   const def = QUESTOES[grupo][id]
   const tipo = extra.tipo || (grupo === 'likert' ? 'likert' : def.tipo === 'multi' ? 'multi' : def.tipo === 'texto' ? 'texto' : 'opcao')
@@ -1880,8 +1936,15 @@ function q(grupo, id, extra = {}) {
     placeholder: extra.placeholder || '',
     secao: extra.secao || 'perfil',
     opcoes: def.opcoes || null,
+    pular: extra.pular || null,
+    padrao: extra.padrao ?? null,
+    preencher: extra.preencher || null,
   }
 }
+
+// Condicionais do bloco "quem vende".
+const donaFazTudo = (a) => a.categoricas.S1 === 'sou_eu'
+const respondeAutomatico = (a) => a.roteamento.quem_responde_digital === 'automatico'
 
 const PERGUNTAS = [
   q('lead', 'nome', { prompt: 'Pra começar: como você se chama?', placeholder: 'Ex: Camila', secao: 'perfil' }),
@@ -1911,10 +1974,17 @@ const PERGUNTAS = [
   q('likert', 'WA1', { secao: 'whatsapp' }),
   q('likert', 'WA3', { secao: 'whatsapp' }),
 
-  q('categoricas', 'S1', { secao: 'papel' }),
-  q('categoricas', 'S2', { secao: 'papel' }),
-  q('categoricas', 'S3', { secao: 'papel' }),
-  q('categoricas', 'S4', { secao: 'papel' }),
+  q('categoricas', 'S1', {
+    secao: 'papel',
+    prompt: (a) => (respondeAutomatico(a) ? 'Quem configurou a ferramenta que responde hoje foi orientado a fazer o quê?' : QUESTOES.categoricas.S1.texto),
+  }),
+  q('categoricas', 'S2', {
+    secao: 'papel',
+    prompt: (a) => (donaFazTudo(a) ? 'Você consegue conduzir uma conversa de protocolo de ticket alto até o fechamento, sozinha, pelo WhatsApp?' : QUESTOES.categoricas.S2.texto),
+  }),
+  // Se a dona faz tudo, remuneração e faixa não se aplicam: o motor já entende `sou_eu`.
+  q('categoricas', 'S3', { secao: 'papel', pular: donaFazTudo, padrao: 'sou_eu' }),
+  q('categoricas', 'S4', { secao: 'papel', pular: donaFazTudo, padrao: 'sou_eu' }),
   q('categoricas', 'S5', { secao: 'papel' }),
   q('categoricas', 'S6', { secao: 'papel' }),
 
@@ -1962,6 +2032,18 @@ const ANALISE_FRASES = [
   'Checando se tráfego cabe agora…',
   'Roteando a oferta…',
 ]
+
+// Tempo real de resposta, medido do "Começar" até o laudo sair. Mínimo 1 minuto.
+function mensagemTempo(segundos) {
+  const min = Math.max(1, Math.round((segundos || 0) / 60))
+  return `Você levou ${min} minuto${min === 1 ? '' : 's'}.`
+}
+
+const MENSAGEM_LINK = 'Seu laudo tem um link:'
+const NOTA_RODAPE = {
+  comLaudo: 'Laudo comentado, gerado das suas respostas. O motor decide; o texto explica.',
+  semLaudo: 'Pré-laudo do motor. O laudo comentado sai no WhatsApp.',
+}
 
 // ---------------------------------------------------------------------------
 // Condecorações (18). when(a, r) recebe answers normalizadas e o resultado do motor.
@@ -2198,6 +2280,9 @@ const NUMEROS_PEDIR = ['Avaliações por semana', '% que fecha em 7 dias', 'Tick
 
 
 
+// Ponto de encontro com módulos opcionais (stories.js registra window.__raiox.gerarStories).
+window.__raiox = window.__raiox || { gerarStories: null }
+
 // ---------------------------------------------------------------------------
 // Estado
 // ---------------------------------------------------------------------------
@@ -2211,17 +2296,26 @@ const state = {
   revealed: false,
   unlocked: new Set(),
   bumps: 0,
+  auto: new Set(), // ids de perguntas preenchidas automaticamente (condicionais)
+  inicio: null, // timestamp do "Começar"
+  duracao_s: null, // segundos até o laudo sair
+  laudo: null, // laudo comentado vindo de POST /api/laudo (ou null = determinístico)
+  link: null, // URL pública do laudo salvo (POST /api/salvar)
+  viewMode: false, // true em /l/:id — só leitura, nada vai pro localStorage
 }
 
 const $ = (sel, root = document) => root.querySelector(sel)
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)]
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+const esperar = (ms) => new Promise((res) => setTimeout(res, ms))
 
 function save() {
+  if (state.viewMode) return
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       view: state.view, cursor: state.cursor, answers: state.answers, lead: state.lead, revealed: state.revealed, unlocked: [...state.unlocked],
+      auto: [...state.auto], inicio: state.inicio, duracao_s: state.duracao_s, laudo: state.laudo, link: state.link,
     }))
   } catch (_) {}
 }
@@ -2238,6 +2332,11 @@ function load() {
     state.lead = s.lead || null
     state.revealed = !!s.revealed
     state.unlocked = new Set(s.unlocked || [])
+    state.auto = new Set(s.auto || [])
+    state.inicio = s.inicio || null
+    state.duracao_s = s.duracao_s ?? null
+    state.laudo = s.laudo && typeof s.laudo === 'object' ? s.laudo : null
+    state.link = typeof s.link === 'string' ? s.link : null
     return true
   } catch (_) { return false }
 }
@@ -2264,9 +2363,16 @@ function buildSteps() {
   return steps
 }
 const STEPS = buildSteps()
+const LEAD_INDEX = STEPS.findIndex((s) => s.type === 'lead-form')
 
 function getAnswer(p) { return state.answers[p.grupo][p.id] }
 function setAnswer(p, v) { state.answers[p.grupo][p.id] = v }
+function limparAnswer(p) { setAnswer(p, p.tipo === 'multi' ? [] : p.tipo === 'texto' ? '' : null) }
+
+// Condicionais: prompt pode ser função das respostas; pular() decide se a pergunta aparece.
+function promptDe(p) { return typeof p.prompt === 'function' ? p.prompt(state.answers) : p.prompt }
+function estaPulada(p) { return typeof p.pular === 'function' && !!p.pular(state.answers) }
+function valorPadrao(p) { return typeof p.preencher === 'function' ? p.preencher(state.answers) : p.padrao }
 function hasAnswer(p) {
   const v = getAnswer(p)
   if (Array.isArray(v)) return v.length > 0
@@ -2354,6 +2460,8 @@ function appendQuestion(step, stepIndex) {
   li.className = 'bubble bubble--question'
   li.dataset.stepIndex = stepIndex
   li.dataset.active = 'question'
+  li.dataset.qid = step.id
+  li.dataset.tipo = step.tipo
 
   const current = getAnswer(step)
   let body = ''
@@ -2364,8 +2472,9 @@ function appendQuestion(step, stepIndex) {
       <button type="button" class="q__option" data-value="${o.valor}" aria-pressed="${current === o.valor}"><span class="q__scale">${o.valor}</span>${esc(o.label)}</button>`).join('')}</div>`
   } else {
     const sel = Array.isArray(current) ? current : current ? [current] : []
-    body = `<div class="q__options" role="group">${Object.entries(step.opcoes).map(([k, label]) => `
-      <button type="button" class="q__option" data-value="${esc(k)}" aria-pressed="${sel.includes(k)}">${esc(label)}</button>`).join('')}</div>`
+    // <kbd> = tecla que seleciona a opção (1–9). Escondido em toque (CSS).
+    body = `<div class="q__options" role="group">${Object.entries(step.opcoes).map(([k, label], i) => `
+      <button type="button" class="q__option" data-value="${esc(k)}" aria-pressed="${sel.includes(k)}">${i < 9 ? `<kbd class="q__key" aria-hidden="true">${i + 1}</kbd>` : ''}${esc(label)}</button>`).join('')}</div>`
   }
 
   const precisaBotao = step.tipo === 'texto' || step.tipo === 'multi'
@@ -2376,7 +2485,7 @@ function appendQuestion(step, stepIndex) {
 
   li.innerHTML = `<article class="q">
       <span class="q__section">${esc(SECOES[step.secao] || step.secao)}</span>
-      <p class="q__prompt">${interpolar(esc(step.prompt))}</p>
+      <p class="q__prompt">${interpolar(esc(promptDe(step)))}</p>
       ${body}${nav}
     </article>`
 
@@ -2464,7 +2573,7 @@ function appendLeadCard(stepIndex) {
     li.dataset.active = ''
     li.querySelectorAll('input,button').forEach((el) => { el.disabled = true })
     save()
-    enviarParaApi()
+    enviarLead()
     startAnalysis(stepIndex)
   })
   stackEl().appendChild(li)
@@ -2501,6 +2610,13 @@ function runFrom(cursor, first = true) {
     }, first ? TIMING.afterUser : TIMING.pause)
     return
   }
+  // Pergunta condicional que não se aplica: grava o padrão e segue, sem card nem balão.
+  if (step.type === 'question' && estaPulada(step)) {
+    setAnswer(step, valorPadrao(step))
+    state.auto.add(step.id)
+    liveUpdate()
+    return runFrom(cursor + 1, first)
+  }
   schedule(() => {
     if (step.type === 'question') appendQuestion(step, cursor)
     else if (step.type === 'lead-form') appendLeadCard(cursor)
@@ -2512,6 +2628,7 @@ function advance(stepIndex) {
   const step = STEPS[stepIndex]
   const li = $(`[data-step-index="${stepIndex}"][data-active]`)
   if (li) li.remove()
+  state.auto.delete(step.id)
   appendUser(step, stepIndex)
   liveUpdate()
   runFrom(stepIndex + 1, true)
@@ -2521,6 +2638,15 @@ function goBack(stepIndex) {
   clearTimeout(timer)
   hideTyping()
   $$('[data-step-index]').forEach((el) => { if (Number(el.dataset.stepIndex) >= stepIndex) el.remove() })
+  // Auto-preenchidas dali pra frente voltam a null: a condição vai ser reavaliada.
+  for (let i = stepIndex; i < STEPS.length; i++) {
+    const s = STEPS[i]
+    if (s.type === 'question' && state.auto.has(s.id)) { limparAnswer(s); state.auto.delete(s.id) }
+  }
+  // Editou resposta: o laudo comentado e o link deixam de bater com as respostas.
+  state.laudo = null
+  state.link = null
+  save()
   runFrom(stepIndex, false)
 }
 
@@ -2650,11 +2776,24 @@ function reportTemplate() {
     </div>
   </section>
 
+  <section class="report__section report__section--gated report__section--msg" data-gated data-msg hidden>
+    <div class="section-head"><span class="section-num">05</span><h3>Mensagem</h3><span class="section-meta">o que eu te mandaria</span></div>
+    <div class="msg">
+      <blockquote class="msg__text" data-msg-text></blockquote>
+      <div class="msg__foot">
+        <button type="button" class="btn-act" data-action="copy-msg">Copiar mensagem</button>
+        <p class="msg__share" data-msg-share hidden></p>
+      </div>
+    </div>
+  </section>
+
   <footer class="report__footer">
     <span class="footer-note" data-footer-note></span>
     <div class="report__actions">
       <button type="button" class="btn-act btn-act--primary" data-action="copy" disabled data-tooltip="Libera quando o laudo sair.">Copiar resumo</button>
+      <button type="button" class="btn-act" data-action="stories" hidden>Stories</button>
       <button type="button" class="btn-act" data-action="print" disabled data-tooltip="Libera quando o laudo sair.">Baixar PDF</button>
+      <button type="button" class="btn-act" data-action="copy-link" hidden>Copiar link</button>
     </div>
   </footer>`
 }
@@ -2702,12 +2841,17 @@ function blocoCompleto(ids, grupo) {
 const PRECO_IDS = PERGUNTAS.filter((p) => p.grupo === 'likert' && p.id.startsWith('P')).map((p) => p.id)
 const PAPEL_IDS = PERGUNTAS.filter((p) => p.grupo === 'categoricas').map((p) => p.id)
 
-// opts: { complete, revealed, animate, answers }
+// Laudo comentado (LLM) só entra onde o texto bate com o formato esperado. Fora disso, determinístico.
+function textoOk(t) { return typeof t === 'string' && t.trim().length > 0 }
+function listaOk(l) { return Array.isArray(l) && l.length > 0 && l.every(textoOk) }
+
+// opts: { complete, revealed, animate, answers, laudo, trackUnlocks }
 function renderReport(root, r, opts = {}) {
   const a = opts.answers || normalizar(state.answers).answers
-  const complete = opts.complete ?? OBRIGATORIAS.every(hasAnswer)
+  const complete = opts.complete ?? (state.viewMode || OBRIGATORIAS.every(hasAnswer))
   const revealed = opts.revealed ?? state.revealed
   const animate = opts.animate ?? true
+  const laudo = 'laudo' in opts ? opts.laudo : state.laudo
 
   // Identidade
   const ident = {
@@ -2735,7 +2879,8 @@ function renderReport(root, r, opts = {}) {
     const txt = s === null ? '—' : String(s)
     if (valEl.textContent !== txt) { valEl.textContent = txt; if (animate && s !== null) flash(valEl) }
     const note = $('[data-note]', row)
-    const n = complete ? notaEixo(e.id, r) : null
+    const comentada = revealed && laudo?.scores_comentados?.[e.id]?.texto
+    const n = complete ? (textoOk(comentada) ? comentada.trim() : notaEixo(e.id, r)) : null
     note.textContent = n || 'Preenche conforme você responde.'
     note.classList.toggle('is-pending', !n)
   }
@@ -2775,7 +2920,8 @@ function renderReport(root, r, opts = {}) {
       personaEl.classList.remove('is-pending')
       if (animate) { personaEl.classList.remove('is-revealing'); void personaEl.offsetWidth; personaEl.classList.add('is-revealing') }
     }
-    flavorEl.textContent = PERSONA_FLAVOR[r.persona_sugerida] || ''
+    const sub = revealed && laudo?.persona?.subtitulo
+    flavorEl.textContent = textoOk(sub) ? sub.trim() : (PERSONA_FLAVOR[r.persona_sugerida] || '')
   } else {
     personaEl.textContent = '???'
     personaEl.classList.add('is-pending')
@@ -2784,17 +2930,21 @@ function renderReport(root, r, opts = {}) {
 
   // SWOT + oferta (gated)
   root.classList.toggle('is-revealed', revealed)
+  root.classList.toggle('has-laudo', revealed && !!laudo)
   if (revealed) {
-    const swot = swotDeterministico(r, a)
+    const det = swotDeterministico(r, a)
     for (const k of Object.keys(SWOT_TITULO)) {
-      $(`[data-swot="${k}"]`, root).innerHTML = (swot[k].length ? swot[k] : ['—']).map((t) => `<li>${esc(t)}</li>`).join('')
+      const lista = listaOk(laudo?.swot?.[k]) ? laudo.swot[k] : det[k]
+      $(`[data-swot="${k}"]`, root).innerHTML = (lista.length ? lista : ['—']).map((t) => `<li>${esc(t)}</li>`).join('')
     }
     const o = r.oferta
+    const porQue = laudo?.oferta?.por_que
     $('[data-offer]', root).innerHTML = `
       <div class="offer__main">
         <span class="offer__kicker">Oferta principal</span>
         <div class="offer__title">${esc(OFERTA_TITULOS[o.principal])}</div>
         <p class="offer__copy">${esc(o.copy_gancho)}</p>
+        ${textoOk(porQue) ? `<p class="offer__why" data-offer-why><span class="offer__kicker">Por quê</span>${esc(porQue.trim())}</p>` : ''}
         ${o.complementar ? `<span class="offer__chip">+ ${esc(OFERTA_TITULOS[o.complementar])}</span>` : ''}
         ${o.trafego_proibido_passo_1 ? '<span class="offer__chip offer__chip--warn">Tráfego não é o passo 1</span>' : ''}
       </div>
@@ -2803,11 +2953,36 @@ function renderReport(root, r, opts = {}) {
         <div class="offer__block"><span class="offer__kicker">Fase 2</span><p>${esc(o.fase_2)}</p></div>
       </div>
       <div class="offer__numbers"><span class="offer__kicker">Os 3 números que eu vou te pedir</span><ol>${NUMEROS_PEDIR.map((n) => `<li>${esc(n)}</li>`).join('')}</ol></div>`
+
+    // 05 Mensagem: só existe com laudo comentado.
+    const msgSec = $('[data-msg]', root)
+    const msg = laudo?.whatsapp_msg_1
+    if (textoOk(msg)) {
+      msgSec.hidden = false
+      $('[data-msg-text]', root).textContent = msg.trim()
+      const share = $('[data-msg-share]', root)
+      share.hidden = !textoOk(laudo?.frase_share)
+      share.textContent = textoOk(laudo?.frase_share) ? laudo.frase_share.trim() : ''
+    } else {
+      msgSec.hidden = true
+    }
+
     $$('[data-action="copy"],[data-action="print"]', root).forEach((b) => { b.disabled = false; b.removeAttribute('data-tooltip') })
-    $('[data-footer-note]', root).textContent = `Pré-laudo gerado pelo motor. O laudo comentado sai no WhatsApp${state.lead ? '' : ' após o cadastro'}.`
+    $('[data-footer-note]', root).textContent = laudo ? NOTA_RODAPE.comLaudo : NOTA_RODAPE.semLaudo
+  } else {
+    $('[data-msg]', root).hidden = true
   }
+  atualizarAcoes(root, { revealed, link: 'link' in opts ? opts.link : state.link })
 
   return { ganhas, novas }
+}
+
+// Botões do rodapé que dependem de contexto: link salvo e gerador de Stories (módulo opcional).
+function atualizarAcoes(root, { revealed, link }) {
+  const copyLink = $('[data-action="copy-link"]', root)
+  if (copyLink) copyLink.hidden = !(revealed && link)
+  const stories = $('[data-action="stories"]', root)
+  if (stories) stories.hidden = !(revealed && !state.viewMode && typeof window.__raiox?.gerarStories === 'function')
 }
 
 function flash(el) {
@@ -2842,7 +3017,12 @@ function updateProgress() {
 
 // Análise + revelação --------------------------------------------------------
 
-function startAnalysis(stepIndex) {
+// Fluxo: animação mínima de ~3,5 s em paralelo com POST /api/laudo (até 25 s).
+// Sem backend (501/404/503/rede), o card sai determinístico e o texto avisa.
+const ANALISE_MIN_MS = 3500
+const LAUDO_TIMEOUT_MS = 25000
+
+async function startAnalysis(stepIndex) {
   const root = $('#laudo')
   const pill = $('[data-analyzing]', root)
   pill.hidden = false
@@ -2851,23 +3031,89 @@ function startAnalysis(stepIndex) {
   const sub = $('[data-analyzing-sub]', root)
   const rot = setInterval(() => { i = (i + 1) % ANALISE_FRASES.length; sub.textContent = ANALISE_FRASES[i] }, 900)
   schedule(() => { showTyping() }, 400)
-  setTimeout(() => {
-    clearInterval(rot)
-    pill.hidden = true
-    root.classList.remove('is-analyzing')
-    state.revealed = true
-    hideTyping()
-    liveUpdate()
-    const r = currentResult()
-    appendBot(`Saiu, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.${r.oferta.trafego_proibido_passo_1 ? ' Tráfego não é o passo 1 aqui.' : ''}`, stepIndex + 1)
-    schedule(() => {
-      appendBot('O laudo completo, com o SWOT comentado e a mensagem que eu te mandaria, vai pro seu WhatsApp. Enquanto isso o card já é seu: copia o resumo ou baixa o PDF.<span data-onboarding-result></span>', stepIndex + 2)
-      $('[data-progress-fill]').style.width = '100%'
-      if (CONFIG.whatsapp) {
-        schedule(() => appendCta(stepIndex + 3), 900)
-      }
-    }, 1400)
-  }, reduceMotion ? 600 : 3600)
+
+  const r0 = currentResult()
+  const [, laudo] = await Promise.all([esperar(reduceMotion ? 600 : ANALISE_MIN_MS), pedirLaudo(r0)])
+  state.laudo = laudo
+
+  clearInterval(rot)
+  pill.hidden = true
+  root.classList.remove('is-analyzing')
+  state.revealed = true
+  if (state.inicio && state.duracao_s === null) state.duracao_s = Math.max(1, Math.round((Date.now() - state.inicio) / 1000))
+  hideTyping()
+  liveUpdate()
+  const r = currentResult()
+  appendBot(`Saiu, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.${r.oferta.trafego_proibido_passo_1 ? ' Tráfego não é o passo 1 aqui.' : ''}`, stepIndex + 1)
+  schedule(() => {
+    const tempo = state.duracao_s !== null ? `<span data-tempo>${esc(mensagemTempo(state.duracao_s))}</span> ` : ''
+    const corpo = laudo
+      ? 'O laudo comentado está no card: SWOT, por quê da oferta e a mensagem que eu te mandaria. Copia o resumo, a mensagem ou baixa o PDF.'
+      : 'O laudo completo, com o SWOT comentado e a mensagem que eu te mandaria, vai pro seu WhatsApp. Enquanto isso o card já é seu: copia o resumo ou baixa o PDF.'
+    appendBot(`${tempo}${corpo}<span data-onboarding-result></span>`, stepIndex + 2)
+    $('[data-progress-fill]').style.width = '100%'
+    if (CONFIG.whatsapp) {
+      schedule(() => appendCta(stepIndex + 3), 900)
+    }
+    salvarLaudo(stepIndex + 4)
+  }, 1400)
+}
+
+function appendLinkBubble(stepIndex) {
+  if (!state.link) return
+  const curto = state.link.replace(/^https?:\/\//, '')
+  const li = document.createElement('li')
+  li.className = 'bubble bubble--bot'
+  li.dataset.stepIndex = stepIndex
+  li.dataset.link = '1'
+  li.innerHTML = `${avatarHtml()}<div class="bubble__text">${esc(MENSAGEM_LINK)} <a href="${esc(state.link)}" target="_blank" rel="noopener" data-link-laudo>${esc(curto)}</a></div>`
+  stackEl().appendChild(li)
+  requestAnimationFrame(() => li.classList.add('is-in'))
+  scrollTo(li)
+}
+
+// Backend opcional. Toda falha vira null/silêncio: o motor já rodou no navegador.
+
+async function postJson(url, body, { timeout = 15000 } = {}) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), timeout)
+  try {
+    const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal })
+    if (!res.ok) return null
+    const data = await res.json().catch(() => null)
+    return data && data.ok === true ? data : null
+  } catch (_) {
+    return null
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+// POST /api/lead — fire-and-forget, não bloqueia nada.
+function enviarLead() {
+  if (!state.lead) return
+  postJson('/api/lead', { lead: state.lead, answers: state.answers, origem: 'app' }).catch(() => {})
+}
+
+// POST /api/laudo { answers } → laudo comentado, ou null. Descarta laudo que contradiz o motor.
+async function pedirLaudo(r) {
+  const data = await postJson('/api/laudo', { answers: state.answers }, { timeout: LAUDO_TIMEOUT_MS })
+  const laudo = data?.laudo
+  if (!laudo || typeof laudo !== 'object' || Array.isArray(laudo)) return null
+  const erros = validarLaudo(laudo, r)
+  if (erros.length) { console.warn('laudo descartado:', erros); return null }
+  return laudo
+}
+
+// POST /api/salvar { answers, laudo } → link público. Se falhar, nada aparece.
+async function salvarLaudo(stepIndex) {
+  const data = await postJson('/api/salvar', { answers: state.answers, laudo: state.laudo })
+  if (!data || typeof data.url !== 'string') return
+  state.link = data.url.startsWith('http') ? data.url : location.origin + data.url
+  save()
+  const root = $('#laudo')
+  if (root) atualizarAcoes(root, { revealed: state.revealed, link: state.link })
+  appendLinkBubble(stepIndex)
 }
 
 function appendCta(stepIndex) {
@@ -2880,12 +3126,6 @@ function appendCta(stepIndex) {
   stackEl().appendChild(li)
   requestAnimationFrame(() => li.classList.add('is-in'))
   scrollTo(li)
-}
-
-async function enviarParaApi() {
-  try {
-    await fetch('/api/avaliar', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(state.answers) })
-  } catch (_) { /* motor roda no cliente; API é opcional */ }
 }
 
 // Toast + tab badge ----------------------------------------------------------
@@ -2963,7 +3203,10 @@ function setupActions() {
     const btn = e.target.closest('[data-action]')
     if (!btn) return
     const act = btn.dataset.action
-    if (act === 'start') { setView('flow'); if (state.cursor === 0) runFrom(0, true) }
+    if (act === 'start') {
+      setView('flow')
+      if (state.cursor === 0) { if (!state.inicio) { state.inicio = Date.now(); save() } runFrom(0, true) }
+    }
     if (act === 'reset') { if (confirm('Apagar as respostas e começar de novo?')) reset() }
     if (act === 'print') window.print()
     if (act === 'copy') {
@@ -2975,8 +3218,84 @@ function setupActions() {
         `Preço: ${SELO_PRECO[r.selos.selo_preco].label} · Quem vende: ${SELO_PAPEL[r.selos.selo_papel].label}`,
         `Oferta principal: ${OFERTA_TITULOS[r.oferta.principal]}${r.oferta.complementar ? ` + ${OFERTA_TITULOS[r.oferta.complementar]}` : ''}`,
         r.oferta.trafego_proibido_passo_1 ? 'Tráfego não é o passo 1.' : '',
+        state.link ? `Laudo: ${state.link}` : '',
       ].filter(Boolean).join('\n')
-      try { await navigator.clipboard.writeText(txt); toastSimple('Resumo copiado.') } catch (_) { toastSimple('Não deu pra copiar. Seleciona o card e copia.') }
+      await copiar(txt, 'Resumo copiado.')
+    }
+    if (act === 'copy-msg') {
+      const msg = state.laudo?.whatsapp_msg_1
+      if (textoOk(msg)) await copiar(msg.trim(), 'Mensagem copiada.')
+    }
+    if (act === 'copy-link') {
+      if (state.link) await copiar(state.link, 'Link copiado.')
+    }
+    if (act === 'stories') gerarStories(btn)
+  })
+  // stories.js pode carregar depois do card: quando registrar, o botão aparece.
+  window.addEventListener('raiox:stories-pronto', () => {
+    const root = $('#laudo')
+    if (root) atualizarAcoes(root, { revealed: state.revealed, link: state.link })
+  })
+}
+
+async function copiar(txt, okMsg) {
+  try { await navigator.clipboard.writeText(txt); toastSimple(okMsg) } catch (_) { toastSimple('Não deu pra copiar. Seleciona o texto e copia.') }
+}
+
+function slug(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+// Stories: PNG 1080×1920 gerado por app/scripts/stories.js (contrato window.__raiox.gerarStories).
+async function gerarStories(btn) {
+  const fn = window.__raiox?.gerarStories
+  if (typeof fn !== 'function') return
+  btn.disabled = true
+  try {
+    const resultado = currentResult()
+    const answers = normalizar(state.answers).answers
+    const blob = await fn({ resultado, answers, tema: document.documentElement.dataset.tema || 'mono', marca: CONFIG.marca })
+    if (!(blob instanceof Blob)) throw new Error('stories sem blob')
+    const nome = `raio-x-${slug(state.answers.lead.nome) || 'clinica'}.png`
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = nome
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 4000)
+    toastSimple('Stories gerado.')
+    const file = typeof File === 'function' ? new File([blob], nome, { type: 'image/png' }) : null
+    if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: CONFIG.marca }) } catch (_) { /* usuário cancelou */ }
+    }
+  } catch (_) {
+    toastSimple('Não deu pra gerar o Stories agora.')
+  } finally {
+    btn.disabled = false
+  }
+}
+
+// Teclado: 1–9 escolhe a opção (Likert: a tecla é o valor), Enter = Continuar quando habilitado.
+function setupTeclado() {
+  document.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return
+    const t = e.target
+    const editando = t && (t.matches?.('input, textarea, select, [contenteditable="true"]'))
+    if (editando) return // Enter no campo de texto já avança pelo handler do próprio input
+    const li = $('[data-active="question"]')
+    if (!li) return
+    if (/^[1-9]$/.test(e.key)) {
+      const opts = $$('.q__option', li)
+      const alvo = li.querySelector('.q__options--likert') ? opts.find((b) => b.dataset.value === e.key) : opts[Number(e.key) - 1]
+      if (alvo) { e.preventDefault(); alvo.click() }
+      return
+    }
+    if (e.key === 'Enter') {
+      if (t && t.closest?.('button, a')) return // o próprio botão focado trata o Enter
+      const next = $('[data-next]', li)
+      if (next && !next.disabled) { e.preventDefault(); next.click() }
     }
   })
 }
@@ -3016,7 +3335,7 @@ let previewFixture = null
 function redesenhaPreview() {
   const root = $('#laudo-preview')
   if (!root || !previewFixture) return
-  renderReport(root, avaliar(previewFixture), { complete: true, revealed: true, animate: false, answers: normalizar(previewFixture).answers })
+  renderReport(root, avaliar(previewFixture), { complete: true, revealed: true, animate: false, answers: normalizar(previewFixture).answers, laudo: null, link: null })
 }
 
 function ajustarPreview() {
@@ -3045,11 +3364,11 @@ async function renderPreview() {
     const r = avaliar(fixture)
     previewFixture = fixture
     root.dataset.pronto = '1'
-    renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers })
+    renderReport(root, r, { complete: true, revealed: true, animate: false, answers: normalizar(fixture).answers, laudo: null, link: null })
     $('[data-footer-note]', root).textContent = 'Exemplo fictício. O seu sai com as suas respostas.'
     $$('[data-action]', root).forEach((b) => { b.disabled = true; b.removeAttribute('data-tooltip') })
   } catch (_) {
-    renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio() })
+    renderReport(root, avaliar(answersVazio()), { complete: false, revealed: false, animate: false, answers: answersVazio(), laudo: null, link: null })
   }
   ajustarPreview()
   if (window.ResizeObserver) new ResizeObserver(ajustarPreview).observe($('[data-preview-frame]'))
@@ -3063,12 +3382,14 @@ function restore() {
   // Reconstrói o chat a partir das respostas já dadas, sem cascata.
   const stack = stackEl()
   stack.innerHTML = ''
-  for (let i = 0; i < state.cursor && i < STEPS.length; i++) {
+  const ate = state.lead ? Math.max(state.cursor, LEAD_INDEX + 1) : state.cursor
+  for (let i = 0; i < ate && i < STEPS.length; i++) {
     const s = STEPS[i]
     if (s.type === 'message') {
       const html = s.fn ? s.fn(getAnswer(s.after), state.answers, currentResult()) : s.html
       if (html) { appendBot(html, i) }
     } else if (s.type === 'question') {
+      if (state.auto.has(s.id)) continue // auto-preenchida: não teve balão
       if (hasAnswer(s) || s.opcional) appendUser(s, i)
     } else if (s.type === 'lead-form' && state.lead) {
       const li = document.createElement('li'); li.className = 'bubble bubble--user'; li.dataset.stepIndex = i
@@ -3079,19 +3400,72 @@ function restore() {
   if (state.revealed) {
     const r = currentResult()
     appendBot(`Seu laudo está aqui, {nome}. Persona: <strong>${esc(r.persona_titulo)}</strong>. Oferta principal: <strong>${esc(OFERTA_TITULOS[r.oferta.principal])}</strong>.`, STEPS.length + 1)
+    appendLinkBubble(STEPS.length + 2)
+  } else if (state.lead) {
+    // Recarregou no meio da análise: retoma a análise em vez de pedir o WhatsApp de novo.
+    startAnalysis(LEAD_INDEX)
   } else if (state.cursor < STEPS.length) {
     runFrom(state.cursor, false)
   }
 }
 
+// Modo visualização: /l/<id> (servidor) ou ?__ver=<id> (host estático / teste) -----
+
+const ID_LAUDO_RE = /^[a-z0-9]{8,16}$/
+
+function idVisualizacao() {
+  const m = /^\/l\/([a-z0-9]{8,16})$/.exec(location.pathname)
+  if (m) return m[1]
+  const q = new URLSearchParams(location.search).get('__ver')
+  return q && ID_LAUDO_RE.test(q) ? q : null
+}
+
+async function initVisualizacao(id) {
+  state.viewMode = true
+  const card = $('#laudo')
+  card.innerHTML = reportTemplate()
+  card.hidden = true
+  $('[data-laudo-slot]').appendChild(card)
+  setupTemas()
+  setupActions()
+  setupTooltips()
+  const cta = $('[data-laudo-cta]')
+  if (cta) cta.href = /^\/l\//.test(location.pathname) ? '/app/' : location.pathname
+  setView('laudo')
+
+  let data = null
+  try {
+    const res = await fetch(`/api/laudo/${encodeURIComponent(id)}`, { headers: { accept: 'application/json' } })
+    if (res.ok) data = await res.json().catch(() => null)
+  } catch (_) { data = null }
+
+  const status = $('[data-laudo-status]')
+  if (!data || data.ok !== true || !data.answers || typeof data.answers !== 'object') {
+    status.hidden = true
+    $('[data-laudo-empty]').hidden = false
+    return
+  }
+  state.answers = { ...answersVazio(), ...data.answers }
+  state.laudo = data.laudo && typeof data.laudo === 'object' ? data.laudo : null
+  state.revealed = true
+  state.link = location.origin + (/^\/l\//.test(location.pathname) ? location.pathname : `/l/${id}`)
+  renderReport(card, currentResult(), { complete: true, revealed: true, animate: false })
+  status.hidden = true
+  card.hidden = false
+  document.title = `${CONFIG.marca} — ${(state.answers.lead.nome || '').trim() || 'laudo'}`
+}
+
 // Init ------------------------------------------------------------------------
 
 function init() {
+  const idVer = idVisualizacao()
+  if (idVer) { initVisualizacao(idVer); return }
   const had = load()
   $('#laudo').innerHTML = reportTemplate()
   setupTemas()
   setupTabs()
   setupActions()
+  setupTeclado()
   setupTooltips()
   renderPreview()
   const r = currentResult()
@@ -3102,6 +3476,562 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init)
+
+
+// ---- app/scripts/stories.js
+// Peça compartilhável do Raio-X da Clínica: um PNG 1080×1920 (formato Stories)
+// desenhado em canvas a partir do `resultado` de avaliar(). Sem fonte web, sem SVG,
+// sem número que não venha do motor. As cores saem dos tokens do tema em runtime.
+//
+//   const blob = await gerarStoriesPNG({ resultado, answers, tema: 'roxo', marca: 'Raio-X da Clínica' })
+//
+// Todo nome de topo é prefixado com `st` pra não colidir no bundle (app/build.mjs
+// concatena os módulos sem escopo).
+
+
+
+const stW = 1080
+const stH = 1920
+const stM = 80
+const stCW = stW - stM * 2
+const stFontStack = '-apple-system, "SF Pro Display", Inter, system-ui, sans-serif'
+
+// Fallback = tema mono. Em runtime lê o token do tema ativo.
+const stCoresMono = {
+  card: '#0B0B0C',
+  surface2: '#161618',
+  fgStrong: '#F5F5F7',
+  fg: '#E6E6EA',
+  fgDim: '#A1A1A6',
+  accent: '#FFFFFF',
+  accentFg: '#0B0B0C',
+  tierTop: '#FFFFFF',
+  tierGood: '#A1A1A6',
+  tierMid: '#FF9F0A',
+  tierLow: '#FF453A',
+  hairline: 'rgba(255,255,255,.09)',
+  hairlineStrong: 'rgba(255,255,255,.18)',
+}
+const stTokens = {
+  card: '--card',
+  surface2: '--surface2',
+  fgStrong: '--fg-strong',
+  fg: '--fg',
+  fgDim: '--fg-dim',
+  accent: '--accent',
+  accentFg: '--accent-fg',
+  tierTop: '--tier-top',
+  tierGood: '--tier-good',
+  tierMid: '--tier-mid',
+  tierLow: '--tier-low',
+  hairline: '--hairline',
+  hairlineStrong: '--hairline-strong',
+}
+
+function stCores() {
+  const out = { ...stCoresMono }
+  if (typeof document === 'undefined' || !document.documentElement) return out
+  const cs = getComputedStyle(document.documentElement)
+  for (const [k, token] of Object.entries(stTokens)) {
+    const v = cs.getPropertyValue(token).trim()
+    if (v) out[k] = v
+  }
+  return out
+}
+
+function stCorFaixa(c, f) {
+  return { top: c.tierTop, good: c.tierGood, mid: c.tierMid, low: c.tierLow, none: c.hairlineStrong }[f] || c.tierGood
+}
+
+function stCorTom(c, tom) {
+  return { top: c.accent, good: c.tierGood, mid: c.tierMid, low: c.tierLow }[tom] || c.fgStrong
+}
+
+// ---------------------------------------------------------------------------
+// Primitivas de desenho
+// ---------------------------------------------------------------------------
+
+function stFont(weight, size) {
+  return `${weight} ${size}px ${stFontStack}`
+}
+
+function stSetFont(ctx, weight, size, tracking = 0) {
+  ctx.font = stFont(weight, size)
+  if ('letterSpacing' in ctx) ctx.letterSpacing = `${tracking}px`
+}
+
+function stMedir(ctx, text, tracking = 0) {
+  const w = ctx.measureText(text).width
+  // Chromium já inclui letterSpacing em measureText quando suportado.
+  return 'letterSpacing' in ctx ? w : w + tracking * Math.max(0, text.length - 1)
+}
+
+function stTexto(ctx, text, x, y, { size = 24, weight = 400, color = '#fff', align = 'left', tracking = 0, baseline = 'alphabetic', alpha = 1 } = {}) {
+  ctx.save()
+  stSetFont(ctx, weight, size, tracking)
+  ctx.fillStyle = color
+  ctx.globalAlpha = alpha
+  ctx.textAlign = align
+  ctx.textBaseline = baseline
+  ctx.fillText(text, x, y)
+  ctx.restore()
+}
+
+// Quebra por palavra medindo com o ctx.font atual. Palavra maior que a largura
+// quebra por caractere. Se estourar maxLines, a última linha ganha reticência.
+function stQuebrar(ctx, text, maxW, maxLines = Infinity) {
+  const palavras = String(text || '').trim().split(/\s+/).filter(Boolean)
+  const linhas = []
+  let atual = ''
+  const push = (l) => { if (l) linhas.push(l) }
+  for (const p of palavras) {
+    const tent = atual ? `${atual} ${p}` : p
+    if (ctx.measureText(tent).width <= maxW) { atual = tent; continue }
+    push(atual)
+    if (ctx.measureText(p).width <= maxW) { atual = p; continue }
+    let parte = ''
+    for (const ch of p) {
+      if (ctx.measureText(parte + ch).width <= maxW) parte += ch
+      else { push(parte); parte = ch }
+    }
+    atual = parte
+  }
+  push(atual)
+  if (linhas.length > maxLines) {
+    const corte = linhas.slice(0, maxLines)
+    let ult = corte[maxLines - 1]
+    while (ult.length && ctx.measureText(`${ult}…`).width > maxW) ult = ult.slice(0, -1).trimEnd()
+    corte[maxLines - 1] = `${ult}…`
+    return corte
+  }
+  return linhas
+}
+
+function stRetArred(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2)
+  ctx.beginPath()
+  ctx.moveTo(x + rr, y)
+  ctx.arcTo(x + w, y, x + w, y + h, rr)
+  ctx.arcTo(x + w, y + h, x, y + h, rr)
+  ctx.arcTo(x, y + h, x, y, rr)
+  ctx.arcTo(x, y, x + w, y, rr)
+  ctx.closePath()
+}
+
+// Pílula com partes de texto lado a lado. Retorna a largura desenhada.
+// opts.dry = só mede.
+function stPilula(ctx, x, y, h, partes, { bg = null, border = null, padX = 22, gap = 12, dry = false, alpha = 1 } = {}) {
+  let w = padX * 2
+  const larguras = partes.map((p) => {
+    stSetFont(ctx, p.weight || 500, p.size || 22, p.tracking || 0)
+    return stMedir(ctx, p.text, p.tracking || 0)
+  })
+  w += larguras.reduce((s, l) => s + l, 0) + gap * (partes.length - 1)
+  if (dry) return w
+  ctx.save()
+  ctx.globalAlpha = alpha
+  stRetArred(ctx, x, y, w, h, h / 2)
+  if (bg) { ctx.fillStyle = bg; ctx.fill() }
+  if (border) { ctx.strokeStyle = border; ctx.lineWidth = 1.5; ctx.stroke() }
+  let cx = x + padX
+  partes.forEach((p, i) => {
+    stTexto(ctx, p.text, cx, y + h / 2 + 1, { size: p.size || 22, weight: p.weight || 500, color: p.color || '#fff', tracking: p.tracking || 0, baseline: 'middle', alpha: p.alpha ?? 1 })
+    cx += larguras[i] + gap
+  })
+  ctx.restore()
+  return w
+}
+
+// Linha de pílulas com quebra. Retorna a altura ocupada.
+function stLinhaPilulas(ctx, x, y, maxW, itens, h, gap, { dry = false } = {}) {
+  let cx = x
+  let cy = y
+  let linhas = 1
+  for (const it of itens) {
+    const w = stPilula(ctx, 0, 0, h, it.partes, { ...it.opts, dry: true })
+    if (cx > x && cx + w > x + maxW) { cx = x; cy += h + gap; linhas++ }
+    if (!dry) stPilula(ctx, cx, cy, h, it.partes, it.opts)
+    cx += w + gap
+  }
+  return itens.length ? linhas * h + (linhas - 1) * gap : 0
+}
+
+// ---------------------------------------------------------------------------
+// Dados derivados do resultado
+// ---------------------------------------------------------------------------
+
+function stPrimeiroNome(answers) {
+  const nome = String(answers?.lead?.nome || '').trim()
+  if (!nome) return ''
+  const p = nome.split(/\s+/)[0]
+  return p.charAt(0).toUpperCase() + p.slice(1)
+}
+
+function stMesAno() {
+  return new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()
+}
+
+function stConquistadas(answers, resultado) {
+  if (!answers || !answers.likert || !answers.categoricas) return []
+  const out = []
+  for (const b of BADGES) {
+    try { if (b.when(answers, resultado)) out.push(b) } catch { /* resposta em branco */ }
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// Seções. Cada uma desenha a partir de y e devolve a altura usada.
+// ---------------------------------------------------------------------------
+
+function stSecTopo(ctx, c, y, marca) {
+  stTexto(ctx, marca.toUpperCase(), stM, y + 20, { size: 20, weight: 600, color: c.fgDim, tracking: 4 })
+  stTexto(ctx, stMesAno(), stW - stM, y + 20, { size: 20, weight: 600, color: c.fgDim, tracking: 3, align: 'right', alpha: 0.6 })
+  return 26
+}
+
+function stSecTitulo(ctx, c, y, nome) {
+  ctx.save()
+  stSetFont(ctx, 700, 64, -1.8)
+  ctx.fillStyle = c.fgStrong
+  ctx.fillText('Raio-X da clínica', stM, y + 60)
+  ctx.restore()
+  let h = 76
+  if (nome) {
+    stTexto(ctx, nome, stM, y + h + 32, { size: 34, weight: 500, color: c.fgDim })
+    h += 46
+  }
+  return h
+}
+
+function stSecPersona(ctx, c, y, resultado, { dry = false } = {}) {
+  const pad = 40
+  const inner = stCW - pad * 2
+  const titulo = resultado.persona_titulo || PERSONAS[resultado.persona_sugerida] || 'Persona'
+  const flavor = PERSONA_FLAVOR[resultado.persona_sugerida] || ''
+
+  stSetFont(ctx, 700, 54, -1.4)
+  const nomeLinhas = stQuebrar(ctx, titulo, inner, 2)
+  stSetFont(ctx, 400, 24, 0)
+  const flavorLinhas = flavor ? stQuebrar(ctx, flavor, inner, 2) : []
+
+  const hLabel = 18
+  const hNome = nomeLinhas.length * 60
+  const hFlavor = flavorLinhas.length ? 16 + flavorLinhas.length * 32 : 0
+  const h = pad + hLabel + 18 + hNome + hFlavor + pad - 8
+  if (dry) return h
+
+  ctx.save()
+  stRetArred(ctx, stM, y, stCW, h, 28)
+  ctx.fillStyle = c.accent
+  ctx.fill()
+  ctx.restore()
+
+  let cy = y + pad
+  stTexto(ctx, 'PERSONA', stM + pad, cy + 16, { size: 18, weight: 700, color: c.accentFg, tracking: 5, alpha: 0.65 })
+  cy += hLabel + 18
+  ctx.save()
+  stSetFont(ctx, 700, 54, -1.4)
+  ctx.fillStyle = c.accentFg
+  for (const l of nomeLinhas) { ctx.fillText(l, stM + pad, cy + 48); cy += 60 }
+  ctx.restore()
+  if (flavorLinhas.length) {
+    cy += 16
+    ctx.save()
+    stSetFont(ctx, 400, 24, 0)
+    ctx.fillStyle = c.accentFg
+    ctx.globalAlpha = 0.78
+    for (const l of flavorLinhas) { ctx.fillText(l, stM + pad, cy + 24); cy += 32 }
+    ctx.restore()
+  }
+  return h
+}
+
+// Radar em losango (mesma geometria do card: Marca topo, Captação direita,
+// Conversão baixo, Equipe esquerda) + 4 barras à direita.
+function stSecRadar(ctx, c, y, scores) {
+  const colW = 500
+  const hSec = 440
+  const cx = stM + colW / 2
+  const maxR = 130
+  const cy = y + 222
+  const val = (id) => (scores[id] === null || scores[id] === undefined ? 0 : scores[id])
+  const cols = EIXOS.map((e) => stCorFaixa(c, faixa(scores[e.id])))
+  const pts = [
+    [cx, cy - maxR * (val('marca_demanda') / 100)],
+    [cx + maxR * (val('captacao') / 100), cy],
+    [cx, cy + maxR * (val('conversao') / 100)],
+    [cx - maxR * (val('equipe_sistema') / 100), cy],
+  ]
+
+  ctx.save()
+  // Grade concêntrica
+  ctx.strokeStyle = c.hairlineStrong
+  ctx.lineWidth = 1
+  for (const f of [1, 0.75, 0.5, 0.25]) {
+    const r = maxR * f
+    ctx.beginPath()
+    ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r, cy)
+    ctx.closePath()
+    ctx.globalAlpha = f === 1 ? 1 : 0.6
+    ctx.stroke()
+  }
+  ctx.globalAlpha = 0.6
+  ctx.setLineDash([3, 5])
+  ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke()
+  ctx.setLineDash([])
+  ctx.globalAlpha = 1
+
+  // Polígono: 4 triângulos com gradiente por aresta
+  const arestas = [[0, 1], [1, 2], [2, 3], [3, 0]]
+  const grad = (a, b) => {
+    const [ax, ay] = pts[a]; const [bx, by] = pts[b]
+    if (Math.abs(ax - bx) < 0.5 && Math.abs(ay - by) < 0.5) return cols[a]
+    const g = ctx.createLinearGradient(ax, ay, bx, by)
+    g.addColorStop(0, cols[a]); g.addColorStop(1, cols[b])
+    return g
+  }
+  ctx.globalAlpha = 0.5
+  for (const [a, b] of arestas) {
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(...pts[a]); ctx.lineTo(...pts[b]); ctx.closePath()
+    ctx.fillStyle = grad(a, b)
+    ctx.fill()
+  }
+  ctx.globalAlpha = 1
+  ctx.lineWidth = 3
+  ctx.lineJoin = 'round'
+  for (const [a, b] of arestas) {
+    ctx.beginPath(); ctx.moveTo(...pts[a]); ctx.lineTo(...pts[b])
+    ctx.strokeStyle = grad(a, b)
+    ctx.stroke()
+  }
+  pts.forEach((p, i) => {
+    if (scores[EIXOS[i].id] === null || scores[EIXOS[i].id] === undefined) return
+    ctx.beginPath(); ctx.arc(p[0], p[1], 8, 0, Math.PI * 2)
+    ctx.fillStyle = cols[i]; ctx.fill()
+    ctx.lineWidth = 3; ctx.strokeStyle = c.card; ctx.stroke()
+  })
+  ctx.restore()
+
+  // Rótulos: eixo + valor colorido
+  const rotulo = (i, x, yLabel, align, valorPrimeiro) => {
+    const e = EIXOS[i]
+    const v = scores[e.id] === null || scores[e.id] === undefined ? '—' : String(scores[e.id])
+    const corV = scores[e.id] === null || scores[e.id] === undefined ? c.fgDim : cols[i]
+    const yV = valorPrimeiro ? yLabel - 26 : yLabel + 38
+    stTexto(ctx, e.radar, x, yLabel, { size: 15, weight: 600, color: c.fgDim, tracking: 2.5, align })
+    stTexto(ctx, v, x, yV, { size: 34, weight: 700, color: corV, align, tracking: -1 })
+  }
+  rotulo(0, cx, cy - maxR - 26, 'center', true)
+  rotulo(1, stM + colW, cy - 8, 'right', false)
+  rotulo(2, cx, cy + maxR + 40, 'center', false)
+  rotulo(3, stM, cy - 8, 'left', false)
+
+  // Barras
+  const bx = stM + colW + 40
+  const bw = stW - stM - bx
+  const rowH = 58
+  const gap = 30
+  const hBars = EIXOS.length * rowH + (EIXOS.length - 1) * gap
+  let by = y + Math.round((hSec - hBars) / 2)
+  EIXOS.forEach((e, i) => {
+    const s = scores[e.id]
+    const cor = cols[i]
+    stTexto(ctx, e.label, bx, by + 22, { size: 23, weight: 600, color: c.fgStrong })
+    stTexto(ctx, s === null || s === undefined ? '—' : String(s), bx + bw, by + 24, { size: 30, weight: 700, color: s === null || s === undefined ? c.fgDim : cor, align: 'right', tracking: -1 })
+    const barY = by + 40
+    ctx.save()
+    stRetArred(ctx, bx, barY, bw, 12, 6)
+    ctx.fillStyle = c.hairline; ctx.fill()
+    ctx.strokeStyle = c.hairlineStrong; ctx.lineWidth = 1; ctx.stroke()
+    const fillW = Math.max(0, Math.min(1, val(e.id) / 100)) * bw
+    if (fillW > 0) {
+      stRetArred(ctx, bx, barY, Math.max(fillW, 12), 12, 6)
+      ctx.fillStyle = cor; ctx.fill()
+    }
+    ctx.restore()
+    by += rowH + gap
+  })
+  return hSec
+}
+
+function stSecSelos(ctx, c, y, selos, { dry = false } = {}) {
+  const h = 60
+  const preco = SELO_PRECO[selos?.selo_preco]
+  const papel = SELO_PAPEL[selos?.selo_papel]
+  const item = (key, s) => ({
+    partes: [
+      { text: key, size: 15, weight: 600, color: c.fgDim, tracking: 2.5 },
+      { text: s ? s.label : '—', size: 23, weight: 700, color: s ? stCorTom(c, s.tom) : c.fgDim },
+    ],
+    opts: { bg: c.surface2, border: c.hairlineStrong, padX: 24, gap: 14 },
+  })
+  return stLinhaPilulas(ctx, stM, y, stCW, [item('PREÇO', preco), item('QUEM VENDE', papel)], h, 16, { dry })
+}
+
+function stSecCondecoracoes(ctx, c, y, conquistadas, { dry = false } = {}) {
+  const total = BADGES.length
+  const n = conquistadas.length
+  if (!dry) {
+    stTexto(ctx, 'CONDECORAÇÕES', stM, y + 16, { size: 16, weight: 600, color: c.fgDim, tracking: 3.5 })
+    ctx.save()
+    stSetFont(ctx, 500, 22, 0)
+    const sufixo = ' conquistadas'
+    const wS = ctx.measureText(sufixo).width
+    stTexto(ctx, sufixo, stW - stM, y + 18, { size: 22, weight: 500, color: c.fgDim, align: 'right' })
+    stTexto(ctx, `${n} / ${total}`, stW - stM - wS, y + 18, { size: 24, weight: 700, color: c.fgStrong, align: 'right' })
+    ctx.restore()
+  }
+  let h = 22 + 22
+  const itens = conquistadas.slice(0, 6).map((b) => ({
+    partes: [{ text: b.nome, size: 21, weight: 600, color: c.fg }],
+    opts: { bg: null, border: c.hairlineStrong, padX: 20 },
+  }))
+  if (itens.length) {
+    h += stLinhaPilulas(ctx, stM, y + h, stCW, itens, 46, 12, { dry })
+  } else {
+    if (!dry) stTexto(ctx, 'Nenhuma ainda. O laudo mostra por onde começar.', stM, y + h + 22, { size: 22, weight: 400, color: c.fgDim })
+    h += 30
+  }
+  return h
+}
+
+function stSecProximo(ctx, c, y, oferta, { dry = false } = {}) {
+  const pad = 38
+  const inner = stCW - pad * 2
+  const titulo = OFERTA_TITULOS[oferta?.principal] || 'Diagnóstico pontual'
+  const complementar = oferta?.complementar ? OFERTA_TITULOS[oferta.complementar] : null
+  const alerta = !!oferta?.trafego_proibido_passo_1
+
+  stSetFont(ctx, 700, 44, -1.2)
+  const linhas = stQuebrar(ctx, titulo, inner, 2)
+  let h = pad + 18 + 18 + linhas.length * 50
+  if (complementar) h += 14 + 26
+  if (alerta) h += 20 + 44
+  h += pad - 6
+  if (dry) return h
+
+  ctx.save()
+  stRetArred(ctx, stM, y, stCW, h, 28)
+  ctx.fillStyle = c.surface2; ctx.fill()
+  ctx.strokeStyle = c.hairline; ctx.lineWidth = 1.5; ctx.stroke()
+  ctx.restore()
+
+  let cy = y + pad
+  stTexto(ctx, 'PRÓXIMO PASSO', stM + pad, cy + 16, { size: 18, weight: 700, color: c.accent, tracking: 5 })
+  cy += 18 + 18
+  ctx.save()
+  stSetFont(ctx, 700, 44, -1.2)
+  ctx.fillStyle = c.fgStrong
+  for (const l of linhas) { ctx.fillText(l, stM + pad, cy + 40); cy += 50 }
+  ctx.restore()
+  if (complementar) {
+    cy += 14
+    stTexto(ctx, `Complemento: ${complementar}`, stM + pad, cy + 22, { size: 23, weight: 500, color: c.fgDim })
+    cy += 26
+  }
+  if (alerta) {
+    cy += 20
+    stPilula(ctx, stM + pad, cy, 44, [{ text: 'Tráfego não é o passo 1', size: 20, weight: 700, color: '#FFFFFF' }], { bg: c.tierLow, padX: 20 })
+  }
+  return h
+}
+
+function stRodape(ctx, c, marca) {
+  const yLinha = stH - stM - 74
+  ctx.save()
+  ctx.strokeStyle = c.hairline
+  ctx.lineWidth = 1.5
+  ctx.beginPath(); ctx.moveTo(stM, yLinha); ctx.lineTo(stW - stM, yLinha); ctx.stroke()
+  ctx.restore()
+  const yT = stH - stM - 26
+  stTexto(ctx, 'Faça o seu', stM, yT, { size: 22, weight: 400, color: c.fgDim })
+  stSetFont(ctx, 400, 22, 0)
+  const w = ctx.measureText('Faça o seu').width
+  stTexto(ctx, marca.toUpperCase(), stM + w + 16, yT - 1, { size: 18, weight: 700, color: c.fgStrong, tracking: 3.5 })
+}
+
+// ---------------------------------------------------------------------------
+// Composição
+// ---------------------------------------------------------------------------
+
+function stCompor(ctx, c, { resultado, answers, marca, gapExtra = 0, dry = false }) {
+  const scores = resultado?.scores || { marca_demanda: null, captacao: null, conversao: null, equipe_sistema: null }
+  const conquistadas = stConquistadas(answers, resultado)
+  const gap = 52 + gapExtra
+
+  if (!dry) {
+    ctx.fillStyle = c.card
+    ctx.fillRect(0, 0, stW, stH)
+    // Brilho discreto no canto, como o card
+    const g = ctx.createRadialGradient(stW, 0, 0, stW, 0, 620)
+    g.addColorStop(0, c.accent); g.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.save(); ctx.globalAlpha = 0.07; ctx.fillStyle = g; ctx.fillRect(0, 0, stW, stH); ctx.restore()
+  }
+
+  let y = stM
+  if (!dry) stSecTopo(ctx, c, y, marca)
+  y += 26 + 44
+  if (!dry) stSecTitulo(ctx, c, y, stPrimeiroNome(answers))
+  y += 76 + (stPrimeiroNome(answers) ? 46 : 0)
+  y += gap
+  y += stSecPersona(ctx, c, y, resultado, { dry })
+  y += gap
+  if (!dry) stSecRadar(ctx, c, y, scores)
+  y += 440
+  y += gap
+  y += stSecSelos(ctx, c, y, resultado?.selos, { dry })
+  y += gap
+  y += stSecCondecoracoes(ctx, c, y, conquistadas, { dry })
+  y += gap
+  y += stSecProximo(ctx, c, y, resultado?.oferta, { dry })
+  if (!dry) stRodape(ctx, c, marca)
+  return y
+}
+
+async function gerarStoriesPNG({ resultado, answers, tema = 'mono', marca } = {}) {
+  if (typeof document === 'undefined') throw new Error('gerarStoriesPNG precisa de DOM (canvas)')
+  if (!resultado) throw new Error('gerarStoriesPNG: resultado ausente')
+  const nomeMarca = marca || CONFIG.marca || 'Raio-X da Clínica'
+
+  // O tema pedido pode não ser o ativo na página: aplica só durante a leitura dos tokens.
+  const root = document.documentElement
+  const temaAntes = root.dataset.tema
+  let c
+  try {
+    if (tema && tema !== temaAntes) root.dataset.tema = tema
+    c = stCores()
+  } finally {
+    if (temaAntes === undefined) delete root.dataset.tema
+    else root.dataset.tema = temaAntes
+  }
+
+  if (document.fonts?.ready) { try { await document.fonts.ready } catch { /* segue */ } }
+
+  const canvas = document.createElement('canvas')
+  canvas.width = stW
+  canvas.height = stH
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('canvas 2d indisponível')
+
+  // Passo 1: mede. Passo 2: distribui a folga entre as seções (limitada) e desenha.
+  const limite = stH - stM - 74 - 44
+  const fim = stCompor(ctx, c, { resultado, answers, marca: nomeMarca, dry: true })
+  const folga = limite - fim
+  const gapExtra = Math.max(-16, Math.min(56, Math.floor(folga / 5)))
+  stCompor(ctx, c, { resultado, answers, marca: nomeMarca, gapExtra })
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('toBlob falhou'))), 'image/png')
+  })
+}
+
+if (typeof window !== 'undefined') {
+  window.__raiox = window.__raiox || {}
+  window.__raiox.gerarStories = gerarStoriesPNG
+  window.dispatchEvent(new CustomEvent('raiox:stories-pronto'))
+}
 
 </script>
 </body>
