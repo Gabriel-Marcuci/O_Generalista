@@ -1,0 +1,71 @@
+{
+  "lead": {
+    "nome": "Camila",
+    "papel": "Dona e profissional",
+    "papel_id": "dona_atende",
+    "foco": "HOF · Harmonização",
+    "foco_id": "hof",
+    "porte": "Uma unidade pequena",
+    "objetivo": "Subir o ticket"
+  },
+  "scores": {
+    "marca_demanda": 33,
+    "captacao": 22,
+    "conversao": 14,
+    "equipe_sistema": 10
+  },
+  "persona": {
+    "id": "atendimento_no_lugar_de_venda",
+    "titulo": "Atendimento no lugar de venda",
+    "subtitulo": "A clínica tem alguém no WhatsApp. Não tem comercial. A cadeira foi precificada como secretária e cobrada como closer."
+  },
+  "scores_comentados": {
+    "marca_demanda": { "score": 33, "titulo": "Marca que ainda ensina a pedir preço", "texto": "O conteúdo abre conversa, mas a pergunta que chega é quanto custa." },
+    "captacao": { "score": 22, "titulo": "Fila que depende de postar", "texto": "Origem do paciente não é regra. Indicação não tem ritual." },
+    "conversao": { "score": 14, "titulo": "Avaliação virou balcão de tabela", "texto": "Vocês não medem quantas conversas viram protocolo. Desconto é idioma." },
+    "equipe_sistema": { "score": 10, "titulo": "Função comercial inexistente", "texto": "Quem pega o digital foi contratada para informar valor. Lead das 21h acorda órfão." }
+  },
+  "selo_preco": "desconto_como_habito",
+  "selo_papel": "funcao_ausente",
+  "swot": {
+    "forcas": [
+      "Dona ainda atende e conhece o procedimento que quer vender",
+      "Existe volume de conversa no digital — o canal não está morto",
+      "Orçamento de R$ 3–8k comporta sistema, não remendo",
+      "Objetivo claro: subir ticket, não só aparecer mais"
+    ],
+    "fraquezas": [
+      "A clínica contratou atendimento. Não contratou venda.",
+      "O cargo no discurso é comercial. O contrato é recepção remota.",
+      "Desconto virou idioma, não exceção.",
+      "O vou pensar não tem dono nem data."
+    ],
+    "oportunidades": [
+      "Separar recepção (porta/agenda) de closer (qualifica e conduz)",
+      "Script dos 8 primeiros minutos — preço só depois do plano",
+      "IA segura o fora de hora sem despachar tabela",
+      "Reescrever oferta: protocolo > sessão"
+    ],
+    "alertas": [
+      "Mais tráfego agora multiplica quanto custa para quem não vende.",
+      "IA que só manda valor reproduz a secretária, em escala.",
+      "Vocês vendem limpeza e querem bioestimulador — o funil chama o paciente errado."
+    ]
+  },
+  "badges_conquistadas": [],
+  "badges_bloqueadas": [
+    "Closer de verdade",
+    "Preço sem pechincha",
+    "Follow-up com dono",
+    "IA que qualifica",
+    "Anúncio que agenda",
+    "Protocolo acima da sessão"
+  ],
+  "oferta": {
+    "principal": "PACOTE_COMPLETO",
+    "complementar": null,
+    "por_que": "Captação e comercial quebrados juntos.",
+    "o_que_nao_fazer_agora": "Não aumentar anúncio. Não contratar outra secretária. Não pôr bot de tabela.",
+    "fase_2": "Tráfego só depois do roteiro e do papel existirem."
+  }
+}
